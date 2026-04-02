@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Color Switch Quiz</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: sans-serif; background: #1a1a2e; color: #eee; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+
+  #main-menu, #game-over-screen {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 100vh; gap: 20px; text-align: center;
+  }
+  h1 { font-size: 2.4rem; color: #f0c040; text-shadow: 0 0 16px #f0c04088; }
+  .subtitle { color: #aaa; font-size: 1rem; }
+
+  .btn {
+    padding: 12px 36px; font-size: 1.1rem; border: none; border-radius: 8px;
+    cursor: pointer; font-weight: 600; transition: transform 0.1s, filter 0.1s;
+  }
+  .btn:hover { transform: scale(1.04); filter: brightness(1.12); }
+  .btn:active { transform: scale(0.97); }
+  .btn-start { background: #f0c040; color: #1a1a2e; }
+  .btn-play-again { background: #4caf50; color: #fff; }
+
+  #game-screen { display: none; flex-direction: column; align-items: center; padding: 16px; width: 100%; max-width: 460px; }
+
+  /* HUD */
+  #hud { display: flex; justify-content: space-between; width: 100%; margin-bottom: 12px; font-size: 0.95rem; color: #ccc; }
+  #hud span { background: #16213e; padding: 6px 14px; border-radius: 20px; }
+
+  /* Tube */
+  #tube-container { position: relative; width: 90px; height: 320px; margin: 0 auto 18px; }
+  #tube {
+    width: 90px; height: 320px; border: 3px solid #555; border-top: none;
+    border-radius: 0 0 18px 18px; background: rgba(255,255,255,0.05);
+    display: flex; flex-direction: column-reverse; align-items: center;
+    gap: 4px; padding: 6px 6px 10px; overflow: hidden; position: relative;
+  }
+  .tube-ball {
+    width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0;
+    transition: background 0.3s;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem; font-weight: bold; box-shadow: inset 0 -4px 8px rgba(0,0,0,0.3);
+  }
+  #ball-count-bar {
+    position: absolute; right: -34px; top: 0; height: 100%; display: flex; flex-direction: column; justify-content: space-evenly; align-items: center;
+  }
+  .count-tick { width: 10px; height: 2px; background: #444; }
+  .count-tick.danger { background: #e74c3c; }
+  #tube-label { text-align: center; color: #888; font-size: 0.8rem; margin-top: 4px; }
+
+  /* Incoming ball */
+  #incoming-area { margin-bottom: 18px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  #incoming-ball {
+    width: 70px; height: 70px; border-radius: 50%; border: 3px dashed rgba(255,255,255,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; font-weight: bold;
+    transition: background 0.4s, border-color 0.4s;
+    box-shadow: 0 0 18px rgba(255,255,255,0.15);
+  }
+  #incoming-label { font-size: 0.8rem; color: #888; }
+
+  /* Quiz modal */
+  #quiz-modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none;
+    align-items: center; justify-content: center; z-index: 100; padding: 16px;
+  }
+  #quiz-box {
+    background: #16213e; border: 1px solid #334; border-radius: 16px;
+    padding: 28px 24px; max-width: 420px; width: 100%; text-align: center;
+  }
+  #question-text { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.5; color: #e0e0e0; }
+  #answers { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .answer-btn {
+    padding: 12px 8px; background: #0f3460; border: 2px solid #1a5276;
+    border-radius: 10px; color: #eee; font-size: 0.95rem; cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .answer-btn:hover { background: #1a5276; border-color: #5dade2; }
+  .answer-btn.correct { background: #1e8449; border-color: #2ecc71 !important; color: #fff; }
+  .answer-btn.wrong { background: #922b21; border-color: #e74c3c !important; color: #fff; }
+
+  /* Feedback flash */
+  #feedback {
+    font-size: 1rem; min-height: 28px; font-weight: 600; text-align: center;
+    margin-bottom: 6px; transition: color 0.3s;
+  }
+  .feedback-correct { color: #2ecc71; }
+  .feedback-wrong { color: #e74c3c; }
+
+  /* Streak badge */
+  #streak-badge {
+    font-size: 0.85rem; padding: 4px 14px; border-radius: 20px;
+    background: rgba(240,192,64,0.15); color: #f0c040;
+    min-height: 26px; text-align: center; margin-bottom: 6px;
+  }
+
+  /* Game Over */
+  #game-over-screen { display: none; }
+  #final-score { font-size: 3rem; font-weight: bold; color: #f0c040; }
+
+  /* Color shape symbols inside balls */
+  .shape-circle::after { content: "●"; }
+  .shape-triangle::after { content: "▲"; }
+  .shape-square::after { content: "■"; }
+  .shape-diamond::after { content: "◆"; }
+  .shape-star::after { content: "★"; }
+</style>
+</head>
+<body>
+
+<!-- MAIN MENU -->
+<div id="main-menu">
+  <h1>Color Switch Quiz</h1>
+  <p class="subtitle">Answer trivia · drop balls · clear the tube!</p>
+  <button class="btn btn-start" onclick="startGame()">▶ Start Game</button>
+  <p class="subtitle" style="font-size:0.82rem; max-width:320px;">
+    Answer correctly → ball keeps its color.<br>
+    Answer wrong → ball changes color &amp; drops.<br>
+    3 same-color balls in a row → POP for bonus points!<br>
+    10 balls in tube = Game Over.
+  </p>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="game-screen">
+  <div id="hud">
+    <span>Score: <strong id="score-display">0</strong></span>
+    <span>Balls: <strong id="ball-count-display">0</strong>/10</span>
+    <span>Streak: <strong id="streak-display">0</strong></span>
+  </div>
+
+  <div id="incoming-area">
+    <div id="incoming-label">Next ball</div>
+    <div id="incoming-ball"></div>
+  </div>
+
+  <div id="feedback"></div>
+  <div id="streak-badge"></div>
+
+  <div id="tube-container">
+    <div id="tube"></div>
+    <div id="ball-count-bar"></div>
+  </div>
+  <div id="tube-label">Tube (max 10 balls)</div>
+</div>
+
+<!-- QUIZ MODAL -->
+<div id="quiz-modal">
+  <div id="quiz-box">
+    <div id="question-text"></div>
+    <div id="answers"></div>
+  </div>
+</div>
+
+<!-- GAME OVER -->
+<div id="game-over-screen">
+  <h1>Game Over</h1>
+  <div id="final-score">0</div>
+  <p class="subtitle">Final Score</p>
+  <button class="btn btn-play-again" onclick="startGame()">Play Again</button>
+  <button class="btn" style="background:#334;color:#eee;margin-top:6px" onclick="showMenu()">Main Menu</button>
+</div>
+
+<script>
+// ── Color definitions (colorblind-friendly shapes included) ──────────────
+const COLORS = [
+  { name: "red",    bg: "#e74c3c", text: "#fff", shape: "▲" },
+  { name: "blue",   bg: "#3498db", text: "#fff", shape: "■" },
+  { name: "green",  bg: "#2ecc71", text: "#1a1a2e", shape: "●" },
+  { name: "yellow", bg: "#f1c40f", text: "#1a1a2e", shape: "◆" },
+  { name: "purple", bg: "#9b59b6", text: "#fff", shape: "★" },
+];
+function randomColor(exclude) {
+  const opts = exclude ? COLORS.filter(c => c.name !== exclude.name) : COLORS;
+  return opts[Math.floor(Math.random() * opts.length)];
+}
+
+// ── Trivia questions ─────────────────────────────────────────────────────
+const ALL_QUESTIONS = [
+  { q:"What is the capital of France?", a:"Paris", opts:["London","Berlin","Paris","Madrid"] },
+  { q:"How many sides does a hexagon have?", a:"6", opts:["5","6","7","8"] },
+  { q:"What planet is closest to the Sun?", a:"Mercury", opts:["Venus","Mars","Mercury","Earth"] },
+  { q:"What is 12 × 12?", a:"144", opts:["124","132","144","156"] },
+  { q:"Who wrote Romeo and Juliet?", a:"Shakespeare", opts:["Dickens","Shakespeare","Chaucer","Austen"] },
+  { q:"What gas do plants absorb?", a:"CO₂", opts:["O₂","N₂","CO₂","H₂"] },
+  { q:"What is the largest ocean?", a:"Pacific", opts:["Atlantic","Indian","Pacific","Arctic"] },
+  { q:"How many continents are there?", a:"7", opts:["5","6","7","8"] },
+  { q:"What color do you get mixing red and blue?", a:"Purple", opts:["Green","Orange","Purple","Brown"] },
+  { q:"What is the square root of 81?", a:"9", opts:["7","8","9","10"] },
+  { q:"What language is spoken in Brazil?", a:"Portuguese", opts:["Spanish","English","Portuguese","French"] },
+  { q:"How many days are in a leap year?", a:"366", opts:["364","365","366","367"] },
+  { q:"What is the chemical symbol for water?", a:"H₂O", opts:["CO₂","HO","H₂O","H₂O₂"] },
+  { q:"Which planet has rings?", a:"Saturn", opts:["Jupiter","Saturn","Uranus","Both B&C"] },
+  { q:"What is the tallest mountain on Earth?", a:"Everest", opts:["K2","Kangchenjunga","Everest","Makalu"] },
+  { q:"How many teeth do adult humans have?", a:"32", opts:["28","30","32","34"] },
+  { q:"What is 15% of 200?", a:"30", opts:["20","25","30","35"] },
+  { q:"Who painted the Mona Lisa?", a:"Da Vinci", opts:["Michelangelo","Raphael","Da Vinci","Botticelli"] },
+  { q:"What is the fastest land animal?", a:"Cheetah", opts:["Lion","Cheetah","Greyhound","Horse"] },
+  { q:"How many bones are in the adult human body?", a:"206", opts:["198","206","212","225"] },
+  // TC-04 new questions (variety)
+  { q:"What is the boiling point of water (°C)?", a:"100", opts:["90","95","100","110"] },
+  { q:"What is the currency of Japan?", a:"Yen", opts:["Yuan","Won","Yen","Ringgit"] },
+  { q:"In what year did World War II end?", a:"1945", opts:["1943","1944","1945","1946"] },
+  { q:"How many strings does a standard guitar have?", a:"6", opts:["4","5","6","7"] },
+  { q:"What is the largest planet in our solar system?", a:"Jupiter", opts:["Saturn","Neptune","Jupiter","Uranus"] },
+  { q:"What is 7 × 8?", a:"56", opts:["54","55","56","57"] },
+];
+
+// ── Game state ────────────────────────────────────────────────────────────
+let score = 0;
+let streak = 0;
+let tube = [];          // array of color objects, index 0 = bottom
+let pendingColor = null;
+let usedQuestions = [];
+let currentQuestion = null;
+
+// ── DOM refs ──────────────────────────────────────────────────────────────
+const mainMenu     = document.getElementById("main-menu");
+const gameScreen   = document.getElementById("game-screen");
+const gameOverScr  = document.getElementById("game-over-screen");
+const quizModal    = document.getElementById("quiz-modal");
+const tubeEl       = document.getElementById("tube");
+const incomingBall = document.getElementById("incoming-ball");
+const scoreDisplay = document.getElementById("score-display");
+const ballCountDisp= document.getElementById("ball-count-display");
+const streakDisplay= document.getElementById("streak-display");
+const feedbackEl   = document.getElementById("feedback");
+const streakBadge  = document.getElementById("streak-badge");
+const finalScore   = document.getElementById("final-score");
+
+// ── Start / show helpers ──────────────────────────────────────────────────
+function showMenu() {
+  mainMenu.style.display    = "flex";
+  gameScreen.style.display  = "none";
+  gameOverScr.style.display = "none";
+  quizModal.style.display   = "none";
+}
+
+function startGame() {
+  score = 0; streak = 0; tube = []; usedQuestions = [];
+  mainMenu.style.display    = "none";
+  gameScreen.style.display  = "flex";
+  gameOverScr.style.display = "none";
+  quizModal.style.display   = "none";
+  renderTube();
+  updateHUD();
+  pendingColor = randomColor(null);
+  showIncoming(pendingColor);
+  setTimeout(showQuestion, 200);
+}
+
+// ── Incoming ball display ─────────────────────────────────────────────────
+function showIncoming(color) {
+  incomingBall.style.background   = color.bg;
+  incomingBall.style.color        = color.text;
+  incomingBall.style.borderColor  = color.bg;
+  incomingBall.textContent        = color.shape;
+}
+
+// ── Quiz ──────────────────────────────────────────────────────────────────
+function pickQuestion() {
+  if (usedQuestions.length >= ALL_QUESTIONS.length) usedQuestions = [];
+  const remaining = ALL_QUESTIONS.filter((_, i) => !usedQuestions.includes(i));
+  const idx = ALL_QUESTIONS.indexOf(remaining[Math.floor(Math.random() * remaining.length)]);
+  usedQuestions.push(idx);
+  return { ...ALL_QUESTIONS[idx], _idx: idx };
+}
+
+function showQuestion() {
+  currentQuestion = pickQuestion();
+  document.getElementById("question-text").textContent = currentQuestion.q;
+  const answersEl = document.getElementById("answers");
+  answersEl.innerHTML = "";
+  // Shuffle options
+  const opts = [...currentQuestion.opts].sort(() => Math.random() - 0.5);
+  opts.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.className = "answer-btn";
+    btn.textContent = opt;
+    btn.onclick = () => handleAnswer(opt, btn);
+    answersEl.appendChild(btn);
+  });
+  quizModal.style.display = "flex";
+}
+
+function handleAnswer(chosen, btnEl) {
+  // Disable all buttons
+  document.querySelectorAll(".answer-btn").forEach(b => b.onclick = null);
+
+  const correct = (chosen === currentQuestion.a);
+
+  // Highlight answer
+  document.querySelectorAll(".answer-btn").forEach(b => {
+    if (b.textContent === currentQuestion.a) b.classList.add("correct");
+    else if (b === btnEl && !correct) b.classList.add("wrong");
+  });
+
+  setTimeout(() => {
+    quizModal.style.display = "none";
+    if (correct) onCorrect();
+    else onWrong();
+  }, 900);
+}
+
+// ── Correct answer ────────────────────────────────────────────────────────
+function onCorrect() {
+  streak++;
+  const bonus = Math.floor(10 + streak * 2);
+  score += bonus;
+  setFeedback(`✓ Correct! +${bonus}`, true);
+
+  // Ball keeps same color
+  dropBall(pendingColor);
+
+  // Next pending = same color as top of tube (or current)
+  const topColor = tube.length > 0 ? tube[tube.length - 1] : pendingColor;
+  pendingColor = topColor;
+  showIncoming(pendingColor);
+  updateHUD();
+  if (!checkGameOver()) setTimeout(showQuestion, 600);
+}
+
+// ── Wrong answer ──────────────────────────────────────────────────────────
+function onWrong() {
+  streak = 0;
+  setFeedback("✗ Wrong!", false);
+
+  // Ball changes color
+  const newColor = randomColor(pendingColor);
+  dropBall(newColor);
+
+  // Next ball = color at top of tube (the wrong-colored one just dropped)
+  pendingColor = tube.length > 0 ? tube[tube.length - 1] : randomColor(null);
+  showIncoming(pendingColor);
+  updateHUD();
+  if (!checkGameOver()) setTimeout(showQuestion, 600);
+}
+
+// ── Drop ball into tube ───────────────────────────────────────────────────
+function dropBall(color) {
+  tube.push(color);
+  checkAndPopTriple();
+  renderTube();
+}
+
+// ── Pop 3-in-a-row from top ───────────────────────────────────────────────
+function checkAndPopTriple() {
+  if (tube.length < 3) return;
+  const top3 = tube.slice(-3);
+  if (top3[0].name === top3[1].name && top3[1].name === top3[2].name) {
+    tube.splice(-3, 3);
+    score += 50;
+    setFeedback("💥 Triple! +50 bonus!", true);
+    // After popping, next ball = new top of tube
+    if (tube.length > 0) {
+      pendingColor = tube[tube.length - 1];
+      showIncoming(pendingColor);
+    } else {
+      pendingColor = randomColor(null);
+      showIncoming(pendingColor);
+    }
+    updateHUD();
+  }
+}
+
+// ── Render tube ───────────────────────────────────────────────────────────
+function renderTube() {
+  tubeEl.innerHTML = "";
+  tube.forEach(c => {
+    const ball = document.createElement("div");
+    ball.className = "tube-ball";
+    ball.style.background = c.bg;
+    ball.style.color = c.text;
+    ball.textContent = c.shape;
+    tubeEl.appendChild(ball);
+  });
+  ballCountDisp.textContent = tube.length;
+}
+
+// ── HUD update ────────────────────────────────────────────────────────────
+function updateHUD() {
+  scoreDisplay.textContent  = score;
+  streakDisplay.textContent = streak;
+  ballCountDisp.textContent = tube.length;
+  if (streak >= 3)      streakBadge.textContent = `🔥 ${streak}× streak!`;
+  else if (streak >= 2) streakBadge.textContent = `⚡ ${streak}× streak`;
+  else                  streakBadge.textContent = "";
+}
+
+// ── Feedback ──────────────────────────────────────────────────────────────
+let feedbackTimer = null;
+function setFeedback(msg, good) {
+  feedbackEl.textContent = msg;
+  feedbackEl.className = good ? "feedback-correct" : "feedback-wrong";
+  clearTimeout(feedbackTimer);
+  feedbackTimer = setTimeout(() => { feedbackEl.textContent = ""; }, 1800);
+}
+
+// ── Game over ─────────────────────────────────────────────────────────────
+function checkGameOver() {
+  if (tube.length >= 10) {
+    gameScreen.style.display  = "none";
+    gameOverScr.style.display = "flex";
+    finalScore.textContent    = score;
+    return true;
+  }
+  return false;
+}
+</script>
+</body>
+</html>
