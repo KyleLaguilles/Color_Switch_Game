@@ -1,9 +1,11 @@
 # Quoc Hiep Huynh — Role 2: Quiz System & Game Logic Engineer
 
 ## Overview
-This folder contains my contribution for **Role 2: Quiz System & Game Logic Engineer** in our COMSC 380 project.
+This file documents my contribution for **Role 2: Quiz System & Game Logic Engineer** in our COMSC 380 project.
 
-My responsibility is to design and implement the **quiz flow and rule-based game logic** that connects the checkpoint system, question handling, answer evaluation, rewards/penalties, combo multipliers, and score progression.
+My responsibility is to design and implement the **quiz flow and rule-based game logic** that connects checkpoints, question handling, answer evaluation, rewards/penalties, combo streaks, and score progression.
+
+To match the team’s web-based stack, this part is implemented in **HTML, CSS, and JavaScript**.
 
 ---
 
@@ -11,12 +13,20 @@ My responsibility is to design and implement the **quiz flow and rule-based game
 I am responsible for:
 
 - Triggering quiz events at checkpoints
-- Displaying and managing multiple-choice questions
+- Managing multiple-choice quiz questions
 - Evaluating answers as correct or incorrect
 - Applying rewards and penalties
-- Managing combo multipliers / streak logic
+- Managing combo/streak logic
 - Supporting difficulty scaling for quiz questions
-- Providing testable, modular logic for integration with the main game
+- Updating score based on quiz performance
+- Providing modular logic for integration with the main game
+
+---
+
+## Tech Stack for My Part
+- **HTML** — quiz popup structure / demo page
+- **CSS** — quiz styling
+- **JavaScript** — quiz logic, scoring, streaks, effects, difficulty scaling
 
 ---
 
@@ -24,65 +34,60 @@ I am responsible for:
 
 ### 1. Quiz Trigger Logic
 - Quiz appears when a checkpoint condition is met
-- Trigger rule can be configured depending on final team design
+- Trigger rule can be adjusted depending on final game integration
 
 ### 2. Question Management
 - Supports multiple-choice questions
 - Supports categories and difficulty levels
-- Prevents repeated questions when possible
+- Avoids repeated questions when possible
 
 ### 3. Answer Evaluation
 - Checks whether the selected answer is correct
-- Returns a result object that can be used by the frontend/game layer
+- Returns a result object for the game/UI layer
 
 ### 4. Reward / Penalty System
 Examples:
-- Correct answer -> keep same color / bonus score / streak increase
-- Incorrect answer -> change color / streak reset / penalty effect
+- Correct answer → keep same color / bonus score / increase streak
+- Incorrect answer → change color / reset streak / apply penalty effect
 
 ### 5. Combo / Streak Logic
 - Tracks consecutive correct answers
-- Applies combo multiplier or bonus rule
+- Applies bonus logic based on streak length
 
 ### 6. Score Calculation
 - Adds quiz-based score bonus
-- Supports extension for distance-based score from gameplay module
+- Supports future integration with gameplay-based score (such as distance or obstacles)
 
 ### 7. Difficulty Scaling
-- Supports increasing question difficulty based on progress/checkpoints
+- Supports increasing question difficulty based on checkpoint progress
 
 ---
 
 ## Files / Modules
 
-### Core Java Logic
-- `Question.java` — question model
-- `QuizResult.java` — result returned after answer evaluation
-- `QuizEngine.java` — question selection and quiz flow
-- `ScoreEngine.java` — score, streak, combo, and penalty logic
-- `DifficultyManager.java` — scaling rules
-- `TestHarness.java` — simple test runner for core logic
-
-### Optional Spring Boot Scaffold
-- REST-ready structure for future backend integration
-- Can be connected to frontend if the team decides to use a Java service
+### JavaScript Implementation
+- `questions.js` — question bank (category, difficulty, options, correct answer)
+- `quizLogic.js` — core quiz logic and rule engine
+- `app.js` — connects quiz logic to the UI/demo
+- `index.html` — demo interface for testing this module
+- `styles.css` — styling for the quiz interface
 
 ---
 
 ## Design Goals
-This part of the project was designed to be:
+This module was designed to be:
 
-- **Modular** — easy to integrate with frontend and gameplay modules
-- **Testable** — each rule can be verified independently
+- **Modular** — easy to connect with gameplay and UI
+- **Testable** — rules can be checked independently
 - **Traceable** — requirements map clearly to implementation
-- **Simple enough for class scope** — avoids overengineering
+- **Simple enough for class scope** — avoids unnecessary complexity
 
 ---
 
 ## Example Rule Flow
 1. Player reaches checkpoint
 2. System triggers quiz
-3. Player selects answer
+3. Player selects an answer
 4. Logic evaluates correctness
 5. Reward or penalty is applied
 6. Score and streak are updated
@@ -110,7 +115,7 @@ This part of the project was designed to be:
 ---
 
 ## Test Focus
-This role supports the following types of tests:
+This role supports the following tests:
 
 - Quiz trigger test
 - Correct answer evaluation test
@@ -123,16 +128,17 @@ This role supports the following types of tests:
 ---
 
 ## Integration Notes
-This logic is intended to connect with:
+This module is intended to connect with:
 
 - **Game Mechanics Engineer** — checkpoint events, color changes, gameplay effects
-- **Backend / Database Engineer** — question storage, categories, scores
-- **UI/UX Integrator** — quiz popup, answer buttons, score display
+- **Backend / Database Engineer** — question storage, categories, high scores
+- **UI/UX Integrator** — quiz popup, buttons, score display, effects
 
 ---
 
 ## Current Scope Decision
 To keep the project realistic and low-risk for class delivery:
+
 - Single-player only
 - 2–3 quiz categories
 - Checkpoint-based quiz trigger
