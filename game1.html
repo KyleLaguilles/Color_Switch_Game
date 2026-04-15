@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Color Switch Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #0d0d14;
+  --surface:   #13131f;
+  --surface2:  #1a1a2e;
+  --border:    rgba(255,255,255,0.07);
+  --text:      #e8e8f0;
+  --muted:     #6b6b88;
+  --gold:      #f5c842;
+  --green:     #2dce6e;
+  --red:       #ff4757;
+  --tube-w:    96px;
+  --tube-h:    400px;
+  --ball-sz:   70px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#starfield { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+.screen {
+  position: relative; z-index: 1;
+  display: none; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 24px; text-align: center;
+}
+.screen.active { display: flex; }
+
+/* MENU */
+#menu h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: 800;
+  color: var(--gold);
+  letter-spacing: -1px;
+  margin-bottom: 8px;
+}
+#menu .tagline { color: var(--muted); font-size: 1rem; margin-bottom: 36px; }
+.rules {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px 28px;
+  text-align: left;
+  max-width: 360px;
+  margin-bottom: 32px;
+  font-size: 0.9rem;
+  line-height: 2.2;
+  list-style: none;
+}
+.btn-primary {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem;
+  letter-spacing: 0.5px; padding: 14px 48px; border: none; border-radius: 50px;
+  background: var(--gold); color: #0d0d14; cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s;
+  box-shadow: 0 0 32px rgba(245,200,66,0.35);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 48px rgba(245,200,66,0.5); }
+.btn-primary:active { transform: scale(0.97); }
+.btn-secondary {
+  font-size: 0.95rem; padding: 10px 28px;
+  border: 1px solid var(--border); border-radius: 50px;
+  background: var(--surface); color: var(--muted);
+  cursor: pointer; transition: color 0.15s, border-color 0.15s; margin-top: 10px;
+}
+.btn-secondary:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+/* GAME SCREEN - SPLIT LAYOUT */
+#game {
+  flex-direction: row; align-items: stretch; justify-content: center;
+  gap: 0; padding: 0; min-height: 100vh;
+}
+
+/* LEFT PANEL */
+#left-panel {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 24px 20px; min-width: 200px; gap: 16px;
+  border-right: 1px solid var(--border);
+}
+
+#hud { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.hud-pill {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 8px 14px; display: flex; justify-content: space-between;
+  align-items: center; font-size: 0.85rem; color: var(--muted);
+}
+.hud-pill strong { font-family: 'Syne', sans-serif; font-size: 1.1rem; color: var(--text); }
+
+#tube-wrapper { position: relative; width: var(--tube-w); height: var(--tube-h); }
+#tube-balls {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  display: flex; flex-direction: column-reverse; align-items: center;
+  gap: 3px; padding: 8px 8px 12px; overflow: hidden; height: 100%;
+  border: 2px solid rgba(255,255,255,0.12); border-top: none;
+  border-radius: 0 0 20px 20px;
+}
+.tball {
+  width: calc(var(--tube-w) - 18px); height: calc(var(--tube-w) - 18px);
+  border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; font-weight: 700;
+  box-shadow: inset 0 -5px 10px rgba(0,0,0,0.35), inset 0 3px 6px rgba(255,255,255,0.2);
+}
+.tball.dropping {
+  animation: ballDrop 0.4s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+@keyframes ballDrop {
+  from { transform: translateY(-50px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+.tball.popping {
+  animation: ballPop 0.25s ease-in forwards;
+}
+@keyframes ballPop {
+  0%   { transform: scale(1); opacity: 1; }
+  60%  { transform: scale(1.5); opacity: 0.5; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+#tube-wrapper.danger { animation: tubeGlow 0.7s ease-in-out infinite alternate; }
+@keyframes tubeGlow {
+  from { filter: drop-shadow(0 0 4px rgba(255,71,87,0.4)); }
+  to   { filter: drop-shadow(0 0 20px rgba(255,71,87,0.9)); }
+}
+
+#fill-bar {
+  position: absolute; right: -22px; top: 0; bottom: 0;
+  width: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden;
+}
+#fill-inner {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: var(--green); border-radius: 3px;
+  transition: height 0.4s ease, background 0.4s ease;
+}
+
+#incoming-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+#incoming-label { font-size: 0.75rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+#incoming-ball {
+  width: var(--ball-sz); height: var(--ball-sz); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; font-weight: 700;
+  box-shadow: inset 0 -6px 12px rgba(0,0,0,0.35), inset 0 4px 8px rgba(255,255,255,0.2), 0 0 28px rgba(255,255,255,0.1);
+  transition: background 0.35s ease, box-shadow 0.35s ease;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+
+/* RIGHT PANEL */
+#right-panel {
+  flex: 1; display: flex; flex-direction: column; justify-content: center;
+  padding: 32px 36px; max-width: 520px; gap: 20px;
+}
+
+#question-area {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 28px 24px;
+  transition: border-color 0.3s;
+}
+#question-area.correct-glow { border-color: rgba(45,206,110,0.5); }
+#question-area.wrong-glow   { border-color: rgba(255,71,87,0.5); }
+
+#question-meta { font-size: 0.75rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 14px; }
+#question-text { font-size: 1.2rem; line-height: 1.6; color: var(--text); min-height: 60px; transition: opacity 0.2s; }
+
+#answers { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px; }
+.ans-btn {
+  font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 500;
+  padding: 14px 10px; border: 1.5px solid rgba(255,255,255,0.1); border-radius: 12px;
+  background: var(--surface2); color: var(--text); cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s; line-height: 1.3;
+}
+.ans-btn:hover:not(:disabled) {
+  border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.07); transform: translateY(-1px);
+}
+.ans-btn:active:not(:disabled) { transform: scale(0.97); }
+.ans-btn:disabled { cursor: not-allowed; }
+.ans-btn.correct { background: rgba(45,206,110,0.18); border-color: var(--green); color: var(--green); }
+.ans-btn.wrong   { background: rgba(255,71,87,0.18);  border-color: var(--red);   color: var(--red); }
+
+#feedback-banner {
+  border-radius: 12px; padding: 14px 20px; font-weight: 600; font-size: 1rem;
+  text-align: center; min-height: 52px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+  transition: background 0.25s, border-color 0.25s, color 0.25s;
+}
+#feedback-banner.correct { background: rgba(45,206,110,0.1); border-color: rgba(45,206,110,0.4); color: var(--green); }
+#feedback-banner.wrong   { background: rgba(255,71,87,0.1);  border-color: rgba(255,71,87,0.4);  color: var(--red); }
+#feedback-banner.pop     { background: rgba(245,200,66,0.12); border-color: rgba(245,200,66,0.5); color: var(--gold); }
+
+#streak-row { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--muted); }
+#streak-flames { font-size: 1.2rem; letter-spacing: -2px; min-width: 60px; }
+
+/* GAME OVER */
+#gameover { gap: 16px; }
+#gameover h1 { font-family:'Syne',sans-serif; font-size:3rem; font-weight:800; color:var(--red); }
+#final-score-val { font-family:'Syne',sans-serif; font-size:5rem; font-weight:800; color:var(--gold); line-height:1; }
+#gameover .label { color:var(--muted); font-size:0.9rem; margin-top:-8px; }
+
+/* PARTICLES */
+#particle-layer { position: fixed; inset: 0; pointer-events: none; z-index: 50; overflow: hidden; }
+.particle {
+  position: absolute; border-radius: 50%;
+  animation: particleFly var(--dur) ease-out forwards;
+}
+@keyframes particleFly {
+  0%   { transform: translate(0,0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+}
+
+/* FLOATING SCORES */
+.float-score {
+  position: fixed; font-family:'Syne',sans-serif; font-weight:800; font-size:1.5rem;
+  color: var(--gold); pointer-events:none; z-index:60;
+  animation: floatUp 1s ease-out forwards;
+}
+@keyframes floatUp { 0%{transform:translateY(0);opacity:1} 100%{transform:translateY(-70px);opacity:0} }
+
+/* SCREEN SHAKE */
+@keyframes shake {
+  0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)}
+  40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(4px)}
+}
+.shake { animation: shake 0.4s ease; }
+
+/* RESPONSIVE */
+@media (max-width: 640px) {
+  #game { flex-direction: column; }
+  #left-panel {
+    border-right: none; border-bottom: 1px solid var(--border);
+    flex-direction: row; flex-wrap: wrap; justify-content: center;
+    padding: 16px; gap: 12px; min-width: unset;
+  }
+  #hud { flex-direction: row; width: auto; }
+  #right-panel { padding: 20px 16px; max-width: 100%; }
+  :root { --tube-h: 240px; --tube-w: 80px; --ball-sz: 56px; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+<div id="particle-layer"></div>
+
+<!-- MENU -->
+<div id="menu" class="screen active">
+  <h1>Color Switch<br>Quiz</h1>
+  <p class="tagline">Trivia · Tubes · Chaos</p>
+  <ul class="rules">
+    <li>🎯 Answer correctly → ball keeps its color</li>
+    <li>❌ Answer wrong → ball changes color &amp; drops</li>
+    <li>💥 3 same-color balls in a row → they POP for +50!</li>
+    <li>☠️ 10 balls in the tube → Game Over</li>
+  </ul>
+  <button class="btn-primary" onclick="startGame()">Play</button>
+</div>
+
+<!-- GAME -->
+<div id="game" class="screen">
+  <div id="left-panel">
+    <div id="hud">
+      <div class="hud-pill">
+        <span>Score</span><strong id="score-display">0</strong>
+      </div>
+      <div class="hud-pill" id="balls-pill">
+        <span>Balls</span><strong id="ball-count-display">0/10</strong>
+      </div>
+    </div>
+
+    <div id="incoming-wrap">
+      <div id="incoming-label">Next ball</div>
+      <div id="incoming-ball">●</div>
+    </div>
+
+    <div id="tube-wrapper">
+      <div id="tube-balls"></div>
+      <div id="fill-bar"><div id="fill-inner" style="height:0%"></div></div>
+    </div>
+  </div>
+
+  <div id="right-panel">
+    <div id="streak-row">
+      <div id="streak-flames"></div>
+      <div id="streak-text">No streak yet</div>
+    </div>
+
+    <div id="question-area">
+      <div id="question-meta">Question</div>
+      <div id="question-text">Get ready…</div>
+      <div id="answers"></div>
+    </div>
+
+    <div id="feedback-banner">Answer the question to drop a ball!</div>
+  </div>
+</div>
+
+<!-- GAME OVER -->
+<div id="gameover" class="screen">
+  <h1>Game Over</h1>
+  <div id="final-score-val">0</div>
+  <div class="label">Final Score</div>
+  <button class="btn-primary" onclick="startGame()" style="margin-top:12px">Play Again</button>
+  <button class="btn-secondary" onclick="goMenu()">Main Menu</button>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  STARFIELD
+// ══════════════════════════════════════════
+const sfC = document.getElementById('starfield');
+const sfX = sfC.getContext('2d');
+let stars = [];
+function initStars() {
+  sfC.width = window.innerWidth; sfC.height = window.innerHeight;
+  stars = Array.from({length:130}, () => ({
+    x: Math.random()*sfC.width, y: Math.random()*sfC.height,
+    r: Math.random()*1.2+0.2, a: Math.random(), da: (Math.random()-0.5)*0.007
+  }));
+}
+function drawStars() {
+  sfX.clearRect(0,0,sfC.width,sfC.height);
+  stars.forEach(s => {
+    s.a += s.da;
+    if (s.a<=0||s.a>=1) s.da*=-1;
+    sfX.beginPath(); sfX.arc(s.x,s.y,s.r,0,Math.PI*2);
+    sfX.fillStyle = `rgba(180,180,255,${s.a*0.55})`; sfX.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+window.addEventListener('resize', initStars);
+initStars(); drawStars();
+
+// ══════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════
+const COLORS = [
+  { name:'red',    bg:'#ff4757', text:'#fff',    shape:'▲' },
+  { name:'blue',   bg:'#1e90ff', text:'#fff',    shape:'■' },
+  { name:'green',  bg:'#2ed573', text:'#071a0d', shape:'●' },
+  { name:'yellow', bg:'#ffd32a', text:'#1a1500', shape:'◆' },
+  { name:'purple', bg:'#a55eea', text:'#fff',    shape:'★' },
+];
+const QUESTIONS = [
+  { q:"What is the capital of France?",              a:"Paris",       opts:["London","Berlin","Paris","Madrid"] },
+  { q:"How many sides does a hexagon have?",         a:"6",           opts:["5","6","7","8"] },
+  { q:"Which planet is closest to the Sun?",         a:"Mercury",     opts:["Venus","Mars","Mercury","Earth"] },
+  { q:"What is 12 × 12?",                            a:"144",         opts:["124","132","144","156"] },
+  { q:"Who wrote Romeo and Juliet?",                 a:"Shakespeare", opts:["Dickens","Shakespeare","Chaucer","Austen"] },
+  { q:"What gas do plants absorb from the air?",     a:"CO₂",         opts:["O₂","N₂","CO₂","H₂"] },
+  { q:"What is the largest ocean on Earth?",         a:"Pacific",     opts:["Atlantic","Indian","Pacific","Arctic"] },
+  { q:"How many continents are there?",              a:"7",           opts:["5","6","7","8"] },
+  { q:"Mixing red and blue paint gives you…",        a:"Purple",      opts:["Green","Orange","Purple","Brown"] },
+  { q:"What is the square root of 81?",              a:"9",           opts:["7","8","9","10"] },
+  { q:"What language is spoken in Brazil?",          a:"Portuguese",  opts:["Spanish","English","Portuguese","French"] },
+  { q:"How many days are in a leap year?",           a:"366",         opts:["364","365","366","367"] },
+  { q:"What is the chemical symbol for water?",      a:"H₂O",         opts:["CO₂","HO","H₂O","H₂O₂"] },
+  { q:"Which planet is famous for its rings?",       a:"Saturn",      opts:["Jupiter","Saturn","Uranus","Neptune"] },
+  { q:"What is the tallest mountain on Earth?",      a:"Everest",     opts:["K2","Kangchenjunga","Everest","Makalu"] },
+  { q:"How many teeth do adult humans have?",        a:"32",          opts:["28","30","32","34"] },
+  { q:"What is 15% of 200?",                         a:"30",          opts:["20","25","30","35"] },
+  { q:"Who painted the Mona Lisa?",                  a:"Da Vinci",    opts:["Michelangelo","Raphael","Da Vinci","Botticelli"] },
+  { q:"What is the fastest land animal?",            a:"Cheetah",     opts:["Lion","Cheetah","Greyhound","Horse"] },
+  { q:"How many bones are in the adult human body?", a:"206",         opts:["198","206","212","225"] },
+  { q:"Boiling point of water in °C?",               a:"100",         opts:["90","95","100","110"] },
+  { q:"What is the currency of Japan?",              a:"Yen",         opts:["Yuan","Won","Yen","Ringgit"] },
+  { q:"In what year did World War II end?",          a:"1945",        opts:["1943","1944","1945","1946"] },
+  { q:"How many strings does a standard guitar have?",a:"6",          opts:["4","5","6","7"] },
+  { q:"Largest planet in our solar system?",         a:"Jupiter",     opts:["Saturn","Neptune","Jupiter","Uranus"] },
+  { q:"What is 7 × 8?",                              a:"56",          opts:["54","55","56","57"] },
+  { q:"What is the hardest natural substance?",      a:"Diamond",     opts:["Quartz","Ruby","Diamond","Titanium"] },
+  { q:"How many players are on a soccer team?",      a:"11",          opts:["9","10","11","12"] },
+  { q:"What is the smallest prime number?",          a:"2",           opts:["0","1","2","3"] },
+  { q:"How many hours are in a week?",               a:"168",         opts:["144","160","168","196"] },
+];
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+let score=0, streak=0, tube=[], pendingColor=null;
+let usedQ=[], currentQ=null, locked=false, qCount=0;
+
+// ══════════════════════════════════════════
+//  DOM
+// ══════════════════════════════════════════
+const $menu     = document.getElementById('menu');
+const $game     = document.getElementById('game');
+const $go       = document.getElementById('gameover');
+const $tube     = document.getElementById('tube-balls');
+const $inBall   = document.getElementById('incoming-ball');
+const $score    = document.getElementById('score-display');
+const $balls    = document.getElementById('ball-count-display');
+const $qText    = document.getElementById('question-text');
+const $qMeta    = document.getElementById('question-meta');
+const $answers  = document.getElementById('answers');
+const $fb       = document.getElementById('feedback-banner');
+const $sFl      = document.getElementById('streak-flames');
+const $sTx      = document.getElementById('streak-text');
+const $fillInner= document.getElementById('fill-inner');
+const $tubeWrap = document.getElementById('tube-wrapper');
+const $qArea    = document.getElementById('question-area');
+const $finalSc  = document.getElementById('final-score-val');
+const $bPill    = document.getElementById('balls-pill');
+
+// ══════════════════════════════════════════
+//  FX HELPERS
+// ══════════════════════════════════════════
+function randColor(exc) {
+  const pool = exc ? COLORS.filter(c=>c.name!==exc.name) : COLORS;
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+function shuffle(a) { return [...a].sort(()=>Math.random()-0.5); }
+function goMenu() { $menu.classList.add('active'); $go.classList.remove('active'); $game.classList.remove('active'); }
+
+function burst(x, y, color, n=18) {
+  const layer = document.getElementById('particle-layer');
+  for (let i=0;i<n;i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const angle = (Math.PI*2*i/n) + Math.random()*0.6;
+    const dist  = 50 + Math.random()*90;
+    const sz    = 6 + Math.random()*8;
+    p.style.cssText = `left:${x}px;top:${y}px;background:${color};width:${sz}px;height:${sz}px;--tx:${Math.cos(angle)*dist}px;--ty:${Math.sin(angle)*dist}px;--dur:${0.45+Math.random()*0.45}s`;
+    layer.appendChild(p);
+    setTimeout(()=>p.remove(), 1000);
+  }
+}
+
+function floatScore(el, txt) {
+  const r = el.getBoundingClientRect();
+  const f = document.createElement('div');
+  f.className='float-score'; f.textContent=txt;
+  f.style.left=(r.left+r.width/2-28)+'px'; f.style.top=(r.top-14)+'px';
+  document.body.appendChild(f);
+  setTimeout(()=>f.remove(), 1100);
+}
+
+let shakeTimeout;
+function screenShake() {
+  document.body.classList.remove('shake');
+  clearTimeout(shakeTimeout);
+  void document.body.offsetWidth;
+  document.body.classList.add('shake');
+  shakeTimeout = setTimeout(()=>document.body.classList.remove('shake'), 420);
+}
+
+function glowQuestion(type) {
+  $qArea.classList.remove('correct-glow','wrong-glow');
+  if (type) { $qArea.classList.add(type+'-glow'); setTimeout(()=>$qArea.classList.remove(type+'-glow'), 800); }
+}
+
+// ══════════════════════════════════════════
+//  HUD
+// ══════════════════════════════════════════
+function updateHUD() {
+  $score.textContent = score;
+  $balls.textContent = `${tube.length}/10`;
+  $bPill.querySelector('strong').style.color = tube.length >= 8 ? 'var(--red)' : '';
+
+  const pct = (tube.length/10)*100;
+  $fillInner.style.height = pct+'%';
+  $fillInner.style.background = tube.length>=8 ? 'var(--red)' : tube.length>=6 ? '#ffa502' : 'var(--green)';
+  $tubeWrap.classList.toggle('danger', tube.length>=8);
+
+  if (streak>=6) { $sFl.textContent='🔥🔥🔥'; $sTx.textContent=`${streak}× UNSTOPPABLE!!`; $sTx.style.color='#ff6b35'; }
+  else if (streak>=4) { $sFl.textContent='🔥🔥'; $sTx.textContent=`${streak}× streak — on fire!`; $sTx.style.color='var(--gold)'; }
+  else if (streak>=2) { $sFl.textContent='🔥'; $sTx.textContent=`${streak}× streak`; $sTx.style.color='var(--gold)'; }
+  else { $sFl.textContent=''; $sTx.textContent=streak===1?'1× — keep going!':'No streak yet'; $sTx.style.color='var(--muted)'; }
+}
+
+// ══════════════════════════════════════════
+//  TUBE RENDERING
+// ══════════════════════════════════════════
+function renderTube(newIdx=-1) {
+  $tube.innerHTML='';
+  tube.forEach((c,i) => {
+    const b = document.createElement('div');
+    b.className = 'tball' + (i===newIdx ? ' dropping' : '');
+    b.style.background = c.bg;
+    b.style.color = c.text;
+    b.textContent = c.shape;
+    $tube.appendChild(b);
+  });
+}
+
+function showIncoming(c) {
+  $inBall.style.background = c.bg;
+  $inBall.style.color = c.text;
+  $inBall.style.boxShadow = `inset 0 -6px 12px rgba(0,0,0,0.35), inset 0 4px 8px rgba(255,255,255,0.2), 0 0 36px ${c.bg}99`;
+  $inBall.textContent = c.shape;
+}
+
+// ══════════════════════════════════════════
+//  QUIZ
+// ══════════════════════════════════════════
+function pickQ() {
+  if (usedQ.length>=QUESTIONS.length) usedQ=[];
+  const avail = QUESTIONS.map((_,i)=>i).filter(i=>!usedQ.includes(i));
+  const idx = avail[Math.floor(Math.random()*avail.length)];
+  usedQ.push(idx); return QUESTIONS[idx];
+}
+
+let fbTimer;
+function setFeedback(msg, type) {
+  clearTimeout(fbTimer);
+  $fb.textContent = msg || 'Answer the question to drop a ball!';
+  $fb.className   = type ? `${type}` : '';
+  $fb.id = 'feedback-banner';
+}
+
+function loadQuestion() {
+  locked = false;
+  currentQ = pickQ();
+  qCount++;
+  $qMeta.textContent = `Question #${qCount}`;
+  $qText.style.transition='opacity 0.15s';
+  $qText.style.opacity='0';
+  setTimeout(()=>{ $qText.textContent=currentQ.q; $qText.style.opacity='1'; }, 130);
+
+  $answers.innerHTML='';
+  shuffle(currentQ.opts).forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className='ans-btn'; btn.textContent=opt;
+    btn.onclick=()=>handleAnswer(opt,btn);
+    $answers.appendChild(btn);
+  });
+  setFeedback('','');
+}
+
+function handleAnswer(chosen, btnEl) {
+  if (locked) return;
+  locked = true;
+  const correct = chosen===currentQ.a;
+  $answers.querySelectorAll('.ans-btn').forEach(b => {
+    b.disabled=true;
+    if (b.textContent===currentQ.a) b.classList.add('correct');
+    else if (b===btnEl && !correct) b.classList.add('wrong');
+  });
+  setTimeout(()=>{ correct ? onCorrect() : onWrong(); }, 650);
+}
+
+// ══════════════════════════════════════════
+//  CORRECT
+// ══════════════════════════════════════════
+function onCorrect() {
+  streak++;
+  const pts = Math.floor(10 + streak*2);
+  score += pts;
+  setFeedback(`✓ Correct!  +${pts} points`, 'correct');
+  glowQuestion('correct');
+
+  const r = $inBall.getBoundingClientRect();
+  burst(r.left+r.width/2, r.top+r.height/2, pendingColor.bg, 16);
+  floatScore($inBall, `+${pts}`);
+
+  const newIdx = tube.length;
+  tube.push(pendingColor);
+  renderTube(newIdx);
+  checkTriple();
+
+  const top = tube.length>0 ? tube[tube.length-1] : pendingColor;
+  pendingColor = top;
+  showIncoming(pendingColor);
+  updateHUD();
+  if (!checkGameOver()) setTimeout(loadQuestion, 750);
+}
+
+// ══════════════════════════════════════════
+//  WRONG
+// ══════════════════════════════════════════
+function onWrong() {
+  streak=0;
+  setFeedback('✗ Wrong! Ball changed color.', 'wrong');
+  glowQuestion('wrong');
+  screenShake();
+
+  const newColor = randColor(pendingColor);
+  const newIdx = tube.length;
+  tube.push(newColor);
+  renderTube(newIdx);
+  checkTriple();
+
+  pendingColor = tube.length>0 ? tube[tube.length-1] : randColor(null);
+  showIncoming(pendingColor);
+  updateHUD();
+  if (!checkGameOver()) setTimeout(loadQuestion, 750);
+}
+
+// ══════════════════════════════════════════
+//  TRIPLE POP
+// ══════════════════════════════════════════
+function checkTriple() {
+  if (tube.length<3) return;
+  const top3 = tube.slice(-3);
+  if (top3[0].name===top3[1].name && top3[1].name===top3[2].name) {
+    const wr = $tubeWrap.getBoundingClientRect();
+    const cx = wr.left+wr.width/2, cy = wr.top+wr.height/2;
+    // Animate pop balls before removing
+    const balls = $tube.querySelectorAll('.tball');
+    const popTargets = Array.from(balls).slice(-3);
+    popTargets.forEach(b=>b.classList.add('popping'));
+
+    setTimeout(()=>{
+      tube.splice(-3,3);
+      score+=50;
+      burst(cx,cy,top3[0].bg,30);
+      floatScore($tubeWrap,'💥 +50');
+      setFeedback('💥 TRIPLE POP! +50 bonus!','pop');
+      pendingColor = tube.length>0 ? tube[tube.length-1] : randColor(null);
+      showIncoming(pendingColor);
+      renderTube();
+      updateHUD();
+    }, 260);
+  }
+}
+
+// ══════════════════════════════════════════
+//  GAME OVER
+// ══════════════════════════════════════════
+function checkGameOver() {
+  if (tube.length<10) return false;
+  setTimeout(()=>{
+    $game.classList.remove('active');
+    $go.classList.add('active');
+    $finalSc.textContent = score;
+    burst(window.innerWidth/2, window.innerHeight/2, '#ff4757', 45);
+    burst(window.innerWidth/2, window.innerHeight/2, '#ffd32a', 25);
+  }, 500);
+  return true;
+}
+
+// ══════════════════════════════════════════
+//  START
+// ══════════════════════════════════════════
+function startGame() {
+  score=0; streak=0; tube=[]; usedQ=[]; locked=false; qCount=0;
+  $menu.classList.remove('active');
+  $go.classList.remove('active');
+  $game.classList.add('active');
+  pendingColor = randColor(null);
+  showIncoming(pendingColor);
+  renderTube();
+  updateHUD();
+  setFeedback('','');
+  loadQuestion();
+}
+</script>
+</body>
+</html>
