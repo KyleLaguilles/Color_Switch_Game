@@ -1,0 +1,604 @@
+{
+  "questions": [
+    {
+      "id": "9_0",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "In which country was the 1992 Summer Olympics Games held?",
+      "correct_answer": "Spain",
+      "incorrect_answers": [
+        "Russia",
+        "Korea",
+        "USA"
+      ]
+    },
+    {
+      "id": "9_1",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "What is the world's most expensive spice by weight?",
+      "correct_answer": "Saffron",
+      "incorrect_answers": [
+        "Cinnamon",
+        "Cardamom",
+        "Vanilla"
+      ]
+    },
+    {
+      "id": "9_2",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "Which slogan did the fast food company, McDonald's, use before their \"I'm Lovin' It\" slogan?",
+      "correct_answer": "We Love to See You Smile",
+      "incorrect_answers": [
+        "Why Pay More!?",
+        "Have It Your Way",
+        "Making People Happy Through Food"
+      ]
+    },
+    {
+      "id": "9_3",
+      "category": "General Knowledge",
+      "difficulty": "easy",
+      "question": "What country has had prime ministers named Eden, Major, Peel, Law, Brown and Heath?",
+      "correct_answer": "United Kingdom",
+      "incorrect_answers": [
+        "Australia",
+        "New Zealand",
+        "Canada"
+      ]
+    },
+    {
+      "id": "9_4",
+      "category": "General Knowledge",
+      "difficulty": "hard",
+      "question": "Chartreuse is a color between yellow and what?",
+      "correct_answer": "Green",
+      "incorrect_answers": [
+        "Red",
+        "Black",
+        "Purple"
+      ]
+    },
+    {
+      "id": "9_5",
+      "category": "General Knowledge",
+      "difficulty": "easy",
+      "question": "What is the closest planet to our solar system's sun?",
+      "correct_answer": "Mercury",
+      "incorrect_answers": [
+        "Mars",
+        "Jupiter",
+        "Earth"
+      ]
+    },
+    {
+      "id": "9_6",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "What is the romanized Japanese word for \"university\"?",
+      "correct_answer": "Daigaku",
+      "incorrect_answers": [
+        "Toshokan",
+        "Jimusho",
+        "Shokudou"
+      ]
+    },
+    {
+      "id": "9_7",
+      "category": "General Knowledge",
+      "difficulty": "hard",
+      "question": "Which of the following is an existing family in \"The Sims\"?",
+      "correct_answer": "The Goth Family",
+      "incorrect_answers": [
+        "The Family",
+        "The Simoleon Family",
+        "The Proud Family"
+      ]
+    },
+    {
+      "id": "9_8",
+      "category": "General Knowledge",
+      "difficulty": "easy",
+      "question": "What is the largest living species of penguin?",
+      "correct_answer": "Emperor",
+      "incorrect_answers": [
+        "King",
+        "Gentoo",
+        "Adele"
+      ]
+    },
+    {
+      "id": "9_9",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "Apple co-founder Steve Jobs died from complications of which form of cancer?",
+      "correct_answer": "Pancreatic",
+      "incorrect_answers": [
+        "Bone",
+        "Liver",
+        "Stomach"
+      ]
+    },
+    {
+      "id": "9_10",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "What is the Italian word for \"tomato\"?",
+      "correct_answer": "Pomodoro",
+      "incorrect_answers": [
+        "Aglio",
+        "Cipolla",
+        "Peperoncino"
+      ]
+    },
+    {
+      "id": "9_11",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "Out of these four buildings, which one is the tallest, with a height of 1,483 ft (451.9 m)?",
+      "correct_answer": "Petronas Twin Towers, Malaysia",
+      "incorrect_answers": [
+        "Zifeng Tower, China",
+        "Trump Intl. Hotel & Tower, United States",
+        "Al Hamra Tower, Kuwait"
+      ]
+    },
+    {
+      "id": "9_12",
+      "category": "General Knowledge",
+      "difficulty": "easy",
+      "question": "Which language is most widely spoken in Switzerland?",
+      "correct_answer": "German",
+      "incorrect_answers": [
+        "French",
+        "Italian",
+        "Swiss"
+      ]
+    },
+    {
+      "id": "9_13",
+      "category": "General Knowledge",
+      "difficulty": "easy",
+      "question": "How many fingers does a single human hand have?",
+      "correct_answer": "Four",
+      "incorrect_answers": [
+        "Five",
+        "Ten",
+        "Eight"
+      ]
+    },
+    {
+      "id": "9_14",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "Which essential condiment is also known as Japanese horseradish?",
+      "correct_answer": "Wasabi ",
+      "incorrect_answers": [
+        "Mentsuyu",
+        "Karashi",
+        "Ponzu"
+      ]
+    },
+    {
+      "id": "9_15",
+      "category": "General Knowledge",
+      "difficulty": "easy",
+      "question": "What company owns Outlook?",
+      "correct_answer": "Microsoft",
+      "incorrect_answers": [
+        "Google",
+        "Apple",
+        "Yahoo"
+      ]
+    },
+    {
+      "id": "9_16",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "What direction does the Statue of Liberty face?",
+      "correct_answer": "Southeast",
+      "incorrect_answers": [
+        "Southwest",
+        "Northwest",
+        "Northeast"
+      ]
+    },
+    {
+      "id": "9_17",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "Who is a co-founder of music streaming service Spotify?",
+      "correct_answer": "Daniel Ek",
+      "incorrect_answers": [
+        "Sean Parker",
+        "Felix Miller",
+        "Michael Breidenbruecker"
+      ]
+    },
+    {
+      "id": "9_18",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "What Latin phrase roughly translates to \"seize the day\"?",
+      "correct_answer": "Carpe diem",
+      "incorrect_answers": [
+        "Memento mori",
+        "Plus ultra",
+        "Sic semper tyrannis"
+      ]
+    },
+    {
+      "id": "9_19",
+      "category": "General Knowledge",
+      "difficulty": "easy",
+      "question": "What style of beer will typically have a higher than average hop content?",
+      "correct_answer": "India Pale Ale",
+      "incorrect_answers": [
+        "Stout",
+        "Extra Special Bitter",
+        "Scotch Ale"
+      ]
+    },
+    {
+      "id": "9_20",
+      "category": "General Knowledge",
+      "difficulty": "easy",
+      "question": "How would one say goodbye in Spanish?",
+      "correct_answer": "Adiós",
+      "incorrect_answers": [
+        " Hola",
+        "Au Revoir",
+        "Salir"
+      ]
+    },
+    {
+      "id": "9_21",
+      "category": "General Knowledge",
+      "difficulty": "easy",
+      "question": "The buried remains of which English explorer of Australia were found in London  in January 2019? ",
+      "correct_answer": "Matthew Flinders",
+      "incorrect_answers": [
+        "William Bourke",
+        "Abel Tasman",
+        "Dirk Hartog"
+      ]
+    },
+    {
+      "id": "9_22",
+      "category": "General Knowledge",
+      "difficulty": "hard",
+      "question": "If someone said \"you are olid\", what would they mean?",
+      "correct_answer": "You smell extremely unpleasant.",
+      "incorrect_answers": [
+        "You are out of shape/weak.",
+        "Your appearance is repulsive.",
+        "You are incomprehensible/an idiot."
+      ]
+    },
+    {
+      "id": "9_23",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "Which American manufactured submachine gun was informally known by the American soldiers that used it as \"Grease Gun\"?",
+      "correct_answer": "M3",
+      "incorrect_answers": [
+        "Colt 9mm",
+        "Thompson",
+        "MAC-10"
+      ]
+    },
+    {
+      "id": "9_24",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "What is the Portuguese word for \"Brazil\"?",
+      "correct_answer": "Brasil",
+      "incorrect_answers": [
+        "Brazil",
+        "Brasilia",
+        "Brasíl"
+      ]
+    },
+    {
+      "id": "9_25",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "When did the website \"Facebook\" launch?",
+      "correct_answer": "2004",
+      "incorrect_answers": [
+        "2005",
+        "2003",
+        "2006"
+      ]
+    },
+    {
+      "id": "9_26",
+      "category": "General Knowledge",
+      "difficulty": "hard",
+      "question": "In \"Battle Cats\", what is Moneko / MISS Moneko's critical percentage rate?",
+      "correct_answer": "15%",
+      "incorrect_answers": [
+        "20%",
+        "10%",
+        "25%"
+      ]
+    },
+    {
+      "id": "9_27",
+      "category": "General Knowledge",
+      "difficulty": "easy",
+      "question": "What is the Zodiac symbol for Gemini?",
+      "correct_answer": "Twins",
+      "incorrect_answers": [
+        "Fish",
+        "Scales",
+        "Maiden"
+      ]
+    },
+    {
+      "id": "9_28",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "Macintosh has named six of its operating systems after big cats. What big cat did Macintosh name their 2007 release after? ",
+      "correct_answer": "Leopard",
+      "incorrect_answers": [
+        "Tiger",
+        "Panther",
+        "Puma"
+      ]
+    },
+    {
+      "id": "9_29",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "According to the BBPA, what is the most common pub name in the UK?",
+      "correct_answer": "Red Lion",
+      "incorrect_answers": [
+        "Royal Oak",
+        "White Hart",
+        "King's Head"
+      ]
+    },
+    {
+      "id": "9_30",
+      "category": "General Knowledge",
+      "difficulty": "easy",
+      "question": "The Canadian $1 coin is colloquially known as a what?",
+      "correct_answer": "Loonie",
+      "incorrect_answers": [
+        "Boolie",
+        "Foolie",
+        "Moodie"
+      ]
+    },
+    {
+      "id": "9_31",
+      "category": "General Knowledge",
+      "difficulty": "easy",
+      "question": "Which restaurant's mascot is a clown?",
+      "correct_answer": "McDonald's",
+      "incorrect_answers": [
+        "Whataburger",
+        "Burger King",
+        "Sonic"
+      ]
+    },
+    {
+      "id": "9_32",
+      "category": "General Knowledge",
+      "difficulty": "easy",
+      "question": "Which is the capital of Spain?",
+      "correct_answer": "Madrid",
+      "incorrect_answers": [
+        "Paris",
+        "Barcelona",
+        "Lisboa"
+      ]
+    },
+    {
+      "id": "9_33",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "What was the soft drink Pepsi originally introduced as?",
+      "correct_answer": "Brad's Drink",
+      "incorrect_answers": [
+        "Pepsin Pop",
+        "Carolina Cola",
+        "Pepsin Syrup"
+      ]
+    },
+    {
+      "id": "9_34",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "What was the original name of the search engine \"Google\"?",
+      "correct_answer": "BackRub",
+      "incorrect_answers": [
+        "CatMassage",
+        "SearchPro",
+        "Netscape Navigator"
+      ]
+    },
+    {
+      "id": "9_35",
+      "category": "General Knowledge",
+      "difficulty": "hard",
+      "question": "Originally another word for poppy, coquelicot is a shade of what?",
+      "correct_answer": "Red",
+      "incorrect_answers": [
+        "Green",
+        "Blue",
+        "Pink"
+      ]
+    },
+    {
+      "id": "9_36",
+      "category": "General Knowledge",
+      "difficulty": "easy",
+      "question": "What step in cellular respiration forms ATP?",
+      "correct_answer": "Oxidative Phosphorylation",
+      "incorrect_answers": [
+        "Glycolysis",
+        "Pyruvate Oxidation",
+        "Calvin Cycle"
+      ]
+    },
+    {
+      "id": "9_37",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "Who invented Pastafarianism?",
+      "correct_answer": "Bobby Henderson",
+      "incorrect_answers": [
+        "Eric Tignor",
+        "Bill Nye",
+        "Zach Soldi"
+      ]
+    },
+    {
+      "id": "9_38",
+      "category": "General Knowledge",
+      "difficulty": "easy",
+      "question": " Which chemical element, number 11 in the Periodic table, has the symbol Na?",
+      "correct_answer": "Sodium",
+      "incorrect_answers": [
+        "Carbon",
+        "Lead",
+        "Nitrogen"
+      ]
+    },
+    {
+      "id": "9_39",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "What is the Swedish word for \"window\"?",
+      "correct_answer": "Fönster",
+      "incorrect_answers": [
+        "Hål",
+        "Skärm",
+        "Ruta"
+      ]
+    },
+    {
+      "id": "9_40",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "What is the most-visited website out of these options?",
+      "correct_answer": "Google",
+      "incorrect_answers": [
+        "YouTube",
+        "Facebook",
+        "Wikipedia"
+      ]
+    },
+    {
+      "id": "9_41",
+      "category": "General Knowledge",
+      "difficulty": "easy",
+      "question": "In DC comics where does the Green Arrow (Oliver Queen) live?",
+      "correct_answer": "Star City",
+      "incorrect_answers": [
+        "Central City",
+        "Gotham City",
+        "Metropolis"
+      ]
+    },
+    {
+      "id": "9_42",
+      "category": "General Knowledge",
+      "difficulty": "easy",
+      "question": "When was Pong released?",
+      "correct_answer": "November 29, 1972",
+      "incorrect_answers": [
+        "March 29, 2017",
+        "November 29, 1970",
+        "December 14, 1974"
+      ]
+    },
+    {
+      "id": "9_43",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "All Souls and Merton are constituent colleges of what university?",
+      "correct_answer": "Oxford",
+      "incorrect_answers": [
+        "Cambridge",
+        "Manchester",
+        "Leeds"
+      ]
+    },
+    {
+      "id": "9_44",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "The new One World Trade Center in Manhattan, New York City was designed by which architect? ",
+      "correct_answer": "David Childs",
+      "incorrect_answers": [
+        "Bjarke Ingels",
+        "Michael Arad",
+        "Fumihiko Maki"
+      ]
+    },
+    {
+      "id": "9_45",
+      "category": "General Knowledge",
+      "difficulty": "easy",
+      "question": "The word \"dozen\" usually refers to a group of how many objects?",
+      "correct_answer": "12",
+      "incorrect_answers": [
+        "6",
+        "20",
+        "10"
+      ]
+    },
+    {
+      "id": "9_46",
+      "category": "General Knowledge",
+      "difficulty": "hard",
+      "question": "What year was the RoboSapien toy robot released?",
+      "correct_answer": "2004",
+      "incorrect_answers": [
+        "2000",
+        "2001",
+        "2006"
+      ]
+    },
+    {
+      "id": "9_47",
+      "category": "General Knowledge",
+      "difficulty": "easy",
+      "question": "Who is depicted on the US hundred dollar bill?",
+      "correct_answer": "Benjamin Franklin",
+      "incorrect_answers": [
+        "George Washington",
+        "Abraham Lincoln",
+        "Thomas Jefferson"
+      ]
+    },
+    {
+      "id": "9_48",
+      "category": "General Knowledge",
+      "difficulty": "easy",
+      "question": "What is the name of Poland in Polish?",
+      "correct_answer": "Polska",
+      "incorrect_answers": [
+        "Pupcia",
+        "Polszka",
+        "Póland"
+      ]
+    },
+    {
+      "id": "9_49",
+      "category": "General Knowledge",
+      "difficulty": "medium",
+      "question": "Which of the following correctly describes Japanese word order?",
+      "correct_answer": "Subject Object Verb",
+      "incorrect_answers": [
+        "Subject Verb Object",
+        "Verb Subject Object",
+        "Verb Object Subject"
+      ]
+    }
+  ]
+}
