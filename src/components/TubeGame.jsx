@@ -18,17 +18,114 @@ const CORNER_R      = 14;
 const DISPLAY_FONT = "'Big Shoulders Display', sans-serif";
 const FOCUS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60';
 
+// ── Background falling-balls canvas (start screen only) ─────────────
+function BallsBackground() {
+  const bgRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = bgRef.current;
+    const ctx = canvas.getContext('2d');
+
+    function resize() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    function makeBall(w, h, randomY = false) {
+      const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+      return {
+        x:       Math.random() * w,
+        y:       randomY ? Math.random() * h : -(15 + Math.random() * 35),
+        radius:  15 + Math.random() * 20,
+        color:   color.hex,
+        speed:   0.4 + Math.random() * 1.2,
+        opacity: 0.12 + Math.random() * 0.13,
+      };
+    }
+
+    const balls = Array.from({ length: 18 }, () =>
+      makeBall(window.innerWidth, window.innerHeight, true)
+    );
+
+    let animId;
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const ball of balls) {
+        ball.y += ball.speed;
+        ctx.save();
+        ctx.globalAlpha = ball.opacity;
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+        ctx.fillStyle = ball.color;
+        ctx.fill();
+        ctx.restore();
+        if (ball.y - ball.radius > canvas.height) {
+          Object.assign(ball, makeBall(canvas.width, canvas.height, false));
+        }
+      }
+      animId = requestAnimationFrame(draw);
+    }
+    animId = requestAnimationFrame(draw);
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('resize', resize);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={bgRef}
+      aria-hidden="true"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        zIndex: 0,
+        pointerEvents: 'none',
+      }}
+    />
+  );
+}
+
+// ── Color-cycling "COLOR" letters ────────────────────────────────────
+const COLOR_LETTERS = ['C', 'O', 'L', 'O', 'R'];
+
+function AnimatedTitle() {
+  return (
+    <h1
+      className="text-7xl font-black tracking-tight leading-none uppercase"
+      style={{ fontFamily: DISPLAY_FONT }}
+    >
+      {COLOR_LETTERS.map((letter, i) => (
+        <span
+          key={i}
+          className="color-letter"
+          style={{ animationDelay: `${-(i * 0.8).toFixed(1)}s` }}
+        >
+          {letter}
+        </span>
+      ))}
+      <span style={{ color: 'var(--accent)' }}>Switch</span>
+    </h1>
+  );
+}
+
 // ── Small inline components ─────────────────────────────────────────
 function MainMenu({ onStart }) {
   return (
-    <div className="flex flex-col items-center gap-8 py-8 w-full max-w-sm">
+    <>
+      <BallsBackground />
+      <div
+        className="flex flex-col items-center gap-8 py-8 w-full max-w-sm"
+        style={{ position: 'relative', zIndex: 1 }}
+      >
       <div className="text-center">
-        <h1
-          className="text-7xl font-black tracking-tight leading-none uppercase"
-          style={{ fontFamily: DISPLAY_FONT }}
-        >
-          Color<span style={{ color: 'var(--accent)' }}>Switch</span>
-        </h1>
+        <AnimatedTitle />
         <p
           className="text-xs tracking-[0.25em] uppercase mt-2"
           style={{ color: 'var(--muted)' }}
@@ -90,6 +187,7 @@ function MainMenu({ onStart }) {
         START GAME
       </button>
     </div>
+    </>
   );
 }
 

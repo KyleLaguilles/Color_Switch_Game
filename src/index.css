@@ -21,3 +21,17 @@ body {
   font-family: 'Chakra Petch', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+
+@keyframes letterColorCycle {
+  0%   { color: #e74c3c; }
+  20%  { color: #3498db; }
+  40%  { color: #2ecc71; }
+  60%  { color: #f1c40f; }
+  80%  { color: #9b59b6; }
+  100% { color: #e74c3c; }
+}
+
+.color-letter {
+  animation: letterColorCycle 4s ease-in-out infinite;
+  display: inline;
+}
