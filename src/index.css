@@ -1,1 +1,23 @@
 @import "tailwindcss";
+
+:root {
+  --bg:          oklch(7%  0.022 280);
+  --surface:     oklch(12% 0.026 282);
+  --raised:      oklch(19% 0.030 282);
+  --border:      oklch(100% 0 0 / 0.09);
+  --accent:      oklch(74% 0.19  56);
+  --accent-dark: oklch(67% 0.19  56);
+  --text:        oklch(94% 0.010 280);
+  --muted:       oklch(67% 0.014 280);
+  --danger:      oklch(62% 0.22  20);
+  --success:     oklch(72% 0.18 148);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Chakra Petch', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}

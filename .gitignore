@@ -1,5 +1,8 @@
 /script.py
 
+.claude/
+.codex/
+
 # Dependencies
 node_modules/
 

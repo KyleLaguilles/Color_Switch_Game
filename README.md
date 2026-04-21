@@ -1,4 +1,4 @@
-# Color Switch Game
+npm# Color Switch Game
 Group 2 Project for COMP380 — Color Switch Game with Trivia Questions
 
 ## Stack

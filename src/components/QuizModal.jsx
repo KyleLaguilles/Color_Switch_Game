@@ -9,13 +9,15 @@ function shuffle(arr) {
   return a;
 }
 
-const DIFFICULTY_COLORS = {
-  easy:   'text-green-400 bg-green-400/10',
-  medium: 'text-yellow-400 bg-yellow-400/10',
-  hard:   'text-red-400 bg-red-400/10',
+const DIFFICULTY = {
+  easy:   { color: 'var(--success)',                                    bg: 'color-mix(in oklch, var(--success) 12%, transparent)'  },
+  medium: { color: 'oklch(82% 0.19 90)',                                bg: 'oklch(82% 0.19 90 / 0.12)'                             },
+  hard:   { color: 'var(--danger)',                                     bg: 'color-mix(in oklch, var(--danger) 12%, transparent)'   },
 };
 
-// Inline card — no overlay. Parent controls when this is mounted.
+const FOCUS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60';
+
+// Inline card — parent controls when this is mounted.
 export default function QuizModal({ question, onCorrect, onWrong }) {
   const [shuffledAnswers, setShuffledAnswers] = useState([]);
   const [selected, setSelected]               = useState(null);
@@ -40,43 +42,88 @@ export default function QuizModal({ question, onCorrect, onWrong }) {
     }, 900);
   }
 
-  function getButtonClass(answer) {
-    const base = 'border-2 rounded-xl px-3 py-2.5 text-sm font-medium cursor-pointer transition-all duration-200 w-full text-left';
+  function getAnswerStyle(answer) {
     if (!revealed) {
-      return `${base} bg-[#0f3460] border-[#1a5276] text-white hover:bg-[#1a5276] hover:border-[#2980b9]`;
+      return {
+        backgroundColor: 'var(--raised)',
+        borderColor: 'var(--border)',
+        color: 'var(--text)',
+      };
     }
     if (answer === question.correct_answer) {
-      return `${base} bg-green-800 border-green-400 text-white`;
+      return {
+        backgroundColor: 'color-mix(in oklch, var(--success) 18%, transparent)',
+        borderColor: 'color-mix(in oklch, var(--success) 65%, transparent)',
+        color: 'oklch(82% 0.14 148)',
+      };
     }
     if (answer === selected) {
-      return `${base} bg-red-800 border-red-400 text-white`;
+      return {
+        backgroundColor: 'color-mix(in oklch, var(--danger) 18%, transparent)',
+        borderColor: 'color-mix(in oklch, var(--danger) 65%, transparent)',
+        color: 'oklch(78% 0.16 20)',
+      };
     }
-    return `${base} bg-[#0f3460]/40 border-[#1a5276]/40 text-white/40`;
+    return {
+      backgroundColor: 'transparent',
+      borderColor: 'oklch(100% 0 0 / 0.05)',
+      color: 'var(--muted)',
+      opacity: '0.45',
+    };
   }
 
-  const diffClass = DIFFICULTY_COLORS[question.difficulty] ?? 'text-gray-400 bg-gray-400/10';
+  const diff = DIFFICULTY[question.difficulty] ?? DIFFICULTY.medium;
 
   return (
-    <div className="bg-[#16213e] rounded-2xl p-4 border border-white/10 shadow-xl w-full">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-xs text-gray-500 uppercase tracking-wider truncate mr-2">
+    <div
+      className="rounded-xl p-4 border shadow-xl w-full"
+      style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}
+      role="region"
+      aria-label="Trivia question"
+    >
+      <div className="flex items-center justify-between mb-3">
+        <span
+          className="text-xs uppercase tracking-widest truncate mr-2"
+          style={{ color: 'var(--muted)' }}
+        >
           {question.category}
         </span>
-        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full capitalize shrink-0 ${diffClass}`}>
+        <span
+          className="text-xs font-bold px-2 py-0.5 rounded-full capitalize shrink-0"
+          style={{ color: diff.color, backgroundColor: diff.bg }}
+        >
           {question.difficulty}
         </span>
       </div>
 
-      <p className="text-sm text-gray-100 leading-relaxed mb-4">
+      <p
+        className="text-sm leading-relaxed mb-4"
+        style={{ color: 'var(--text)' }}
+      >
         {question.question}
       </p>
 
-      <div className="flex flex-col gap-2">
-        {shuffledAnswers.map((answer, i) => (
+      <div
+        className="flex flex-col gap-2"
+        role="group"
+        aria-label="Answer choices"
+      >
+        {shuffledAnswers.map(answer => (
           <button
-            key={i}
+            key={answer}
             onClick={() => handleSelect(answer)}
-            className={getButtonClass(answer)}
+            aria-disabled={revealed ? 'true' : undefined}
+            aria-label={
+              revealed && answer === question.correct_answer
+                ? `${answer} — correct`
+                : revealed && answer === selected
+                ? `${answer} — incorrect`
+                : answer
+            }
+            className={`border-2 rounded-xl px-3 py-2.5 text-sm font-medium
+                        transition-all duration-200 w-full text-left ${FOCUS}
+                        ${!revealed ? 'cursor-pointer hover:brightness-125' : 'cursor-default'}`}
+            style={getAnswerStyle(answer)}
           >
             {answer}
           </button>

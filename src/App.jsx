@@ -6,22 +6,24 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#1a1a2e] flex items-center justify-center text-white text-lg">
-        Loading questions…
+      <div className="min-h-screen flex items-center justify-center text-lg"
+           style={{ color: 'var(--muted)' }}>
+        Loading…
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#1a1a2e] flex items-center justify-center text-red-400 text-base px-6 text-center">
+      <div className="min-h-screen flex items-center justify-center px-6 text-center text-base"
+           style={{ color: 'var(--danger)' }}>
         Failed to load questions: {error}
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#1a1a2e] flex flex-col items-center justify-center">
+    <div className="min-h-screen flex flex-col items-center justify-center">
       <TubeGame getNextQuestion={getNextQuestion} />
     </div>
   );

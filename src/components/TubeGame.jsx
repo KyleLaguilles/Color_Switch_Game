@@ -15,30 +15,64 @@ const DROP_SPEED    = 10;
 const MAX_BALLS     = 10;
 const CORNER_R      = 14;
 
+const DISPLAY_FONT = "'Big Shoulders Display', sans-serif";
+const FOCUS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60';
+
 // ── Small inline components ─────────────────────────────────────────
 function MainMenu({ onStart }) {
   return (
-    <div className="flex flex-col items-center gap-6 py-8 w-full max-w-sm">
-      <h1 className="text-4xl font-extrabold text-white tracking-tight">
-        Color<span className="text-[#e74c3c]">Switch</span>
-      </h1>
-      <p className="text-gray-400 text-sm text-center leading-relaxed">
-        Answer trivia questions to control the tube. Stack 3 balls of the same
-        color to clear them. Don&apos;t let the tube fill up!
-      </p>
-
-      <div className="bg-[#16213e] rounded-2xl p-5 w-full text-sm text-gray-300 space-y-2 border border-white/10">
-        <p className="font-semibold text-white mb-1">How to play</p>
-        <p>✅ Correct answer → choose which color drops</p>
-        <p>❌ Wrong answer → random color drops</p>
-        <p>🎯 3 same colors in a row → they clear (+50 pts)</p>
-        <p>💀 Tube fills to {MAX_BALLS} balls → game over</p>
+    <div className="flex flex-col items-center gap-8 py-8 w-full max-w-sm">
+      <div className="text-center">
+        <h1
+          className="text-7xl font-black tracking-tight leading-none uppercase"
+          style={{ fontFamily: DISPLAY_FONT }}
+        >
+          Color<span style={{ color: 'var(--accent)' }}>Switch</span>
+        </h1>
+        <p
+          className="text-xs tracking-[0.25em] uppercase mt-2"
+          style={{ color: 'var(--muted)' }}
+        >
+          Tube Challenge
+        </p>
       </div>
 
-      <div className="flex gap-2">
+      <div
+        className="rounded-xl p-5 w-full text-sm border"
+        style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}
+      >
+        <p
+          className="text-xs font-bold uppercase tracking-widest mb-3"
+          style={{ color: 'var(--accent)' }}
+        >
+          How to play
+        </p>
+        <div className="space-y-2" style={{ color: 'var(--muted)' }}>
+          <p>
+            <span className="font-bold mr-2" style={{ color: 'var(--success)' }}>+</span>
+            Correct answer → choose which color drops
+          </p>
+          <p>
+            <span className="font-bold mr-2" style={{ color: 'var(--danger)' }}>×</span>
+            Wrong answer → random color drops
+          </p>
+          <p>
+            <span className="font-bold mr-2" style={{ color: 'var(--accent)' }}>◆</span>
+            3 same colors in a row → clear them (+50 pts)
+          </p>
+          <p>
+            <span className="font-bold mr-2 opacity-30">■</span>
+            Tube fills to {MAX_BALLS} balls → game over
+          </p>
+        </div>
+      </div>
+
+      <div className="flex gap-3" aria-label="Ball colors in play" role="list">
         {COLORS.map(c => (
           <div
             key={c.name}
+            role="listitem"
+            aria-label={c.name}
             className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-base"
             style={{ backgroundColor: c.hex, color: c.text }}
           >
@@ -49,10 +83,11 @@ function MainMenu({ onStart }) {
 
       <button
         onClick={onStart}
-        className="bg-[#e74c3c] hover:bg-[#c0392b] active:scale-95 text-white font-bold
-                   text-lg px-10 py-3 rounded-full transition-all duration-150 shadow-lg"
+        className={`active:scale-95 font-black text-xl px-12 py-3 rounded-lg
+                    transition-all duration-150 hover:brightness-110 tracking-wider ${FOCUS}`}
+        style={{ backgroundColor: 'var(--accent)', color: '#000', fontFamily: DISPLAY_FONT }}
       >
-        Start Game
+        START GAME
       </button>
     </div>
   );
@@ -60,19 +95,25 @@ function MainMenu({ onStart }) {
 
 function ColorPicker({ onPick }) {
   return (
-    <div className="bg-[#16213e] rounded-2xl p-4 border border-white/10 w-full">
-      <p className="text-xs text-gray-400 uppercase tracking-wider mb-3 text-center">
-        Pick your ball color
+    <div
+      className="rounded-xl p-4 border w-full"
+      style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}
+    >
+      <p
+        className="text-xs font-bold uppercase tracking-widest mb-3 text-center"
+        style={{ color: 'var(--accent)' }}
+      >
+        Pick your color
       </p>
-      <div className="flex flex-wrap gap-3 justify-center">
+      <div className="flex flex-wrap gap-3 justify-center" role="group" aria-label="Color choices">
         {COLORS.map(color => (
           <button
             key={color.name}
             onClick={() => onPick(color)}
             aria-label={`Pick ${color.name}`}
-            className="w-12 h-12 rounded-full border-4 border-white/20 hover:border-white/80
-                       flex items-center justify-center text-xl font-bold
-                       transition-all duration-150 hover:scale-110 active:scale-95"
+            className={`w-12 h-12 rounded-full border-4 border-white/20 hover:border-white/80
+                        flex items-center justify-center text-xl font-bold
+                        transition-all duration-150 hover:scale-110 active:scale-95 ${FOCUS}`}
             style={{ backgroundColor: color.hex, color: color.text }}
           >
             {color.shape}
@@ -85,25 +126,52 @@ function ColorPicker({ onPick }) {
 
 function GameOverScreen({ score, onPlayAgain, onMenu }) {
   return (
-    <div className="flex flex-col items-center gap-6 py-10 w-full max-w-sm">
-      <h2 className="text-3xl font-extrabold text-red-400">Game Over</h2>
-      <p className="text-gray-400 text-sm">The tube overflowed!</p>
-      <div className="bg-[#16213e] rounded-2xl px-12 py-6 text-center border border-white/10">
-        <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Final Score</p>
-        <p className="text-5xl font-extrabold text-white">{score}</p>
+    <div className="flex flex-col items-center gap-8 py-10 w-full max-w-sm text-center">
+      <div>
+        <p
+          className="text-xs font-bold uppercase tracking-[0.3em] mb-2"
+          style={{ color: 'var(--danger)' }}
+        >
+          Game Over
+        </p>
+        <h2
+          className="text-5xl font-black uppercase"
+          style={{ fontFamily: DISPLAY_FONT, color: 'var(--text)' }}
+        >
+          Tube Overflow
+        </h2>
       </div>
+
+      <div>
+        <p
+          className="text-xs font-bold uppercase tracking-[0.3em] mb-1"
+          style={{ color: 'var(--muted)' }}
+        >
+          Final Score
+        </p>
+        <p
+          className="text-8xl font-black leading-none"
+          style={{ fontFamily: DISPLAY_FONT, color: 'var(--accent)' }}
+          aria-label={`Final score: ${score}`}
+        >
+          {score}
+        </p>
+      </div>
+
       <div className="flex gap-3">
         <button
           onClick={onPlayAgain}
-          className="bg-[#e74c3c] hover:bg-[#c0392b] active:scale-95 text-white
-                     font-bold px-8 py-2.5 rounded-full transition-all duration-150"
+          className={`active:scale-95 font-black text-lg px-8 py-2.5 rounded-lg
+                      transition-all duration-150 hover:brightness-110 tracking-wider ${FOCUS}`}
+          style={{ backgroundColor: 'var(--accent)', color: '#000', fontFamily: DISPLAY_FONT }}
         >
-          Play Again
+          PLAY AGAIN
         </button>
         <button
           onClick={onMenu}
-          className="bg-[#16213e] hover:bg-[#1a2a4a] active:scale-95 text-gray-300
-                     font-semibold px-8 py-2.5 rounded-full border border-white/10 transition-all duration-150"
+          className={`active:scale-95 font-semibold px-8 py-2.5 rounded-lg border
+                      transition-all duration-150 hover:brightness-125 ${FOCUS}`}
+          style={{ backgroundColor: 'var(--surface)', color: 'var(--muted)', borderColor: 'var(--border)' }}
         >
           Menu
         </button>
@@ -114,7 +182,7 @@ function GameOverScreen({ score, onPlayAgain, onMenu }) {
 
 // ── Main component ───────────────────────────────────────────────────
 export default function TubeGame({ getNextQuestion }) {
-  // ── React state (drives Tailwind UI) ──────────────────────────────
+  // ── React state ───────────────────────────────────────────────────
   const [phase, setPhase]                     = useState(PHASE.MENU);
   const [score, setScore]                     = useState(0);
   const [streak, setStreak]                   = useState(0);
@@ -123,17 +191,24 @@ export default function TubeGame({ getNextQuestion }) {
   const [pendingColor, setPendingColor]       = useState(null);
   const [feedback, setFeedback]               = useState(null);
 
-  // ── Refs (mutable game data, safe inside rAF) ─────────────────────
+  // ── Refs ───────────────────────────────────────────────────────────
   const canvasRef         = useRef(null);
   const tubeRef           = useRef([]);
   const scoreRef          = useRef(0);
   const streakRef         = useRef(0);
   const pendingRef        = useRef(null);
   const animRef           = useRef(null);
-  const dropAnimRef       = useRef(null);     // { color, y, targetY }
-  const popParticlesRef   = useRef([]);       // [{ x, y, color, progress }]
+  const dropAnimRef       = useRef(null);
+  const popParticlesRef   = useRef([]);
   const onDropCompleteRef = useRef(null);
   const feedbackTimerRef  = useRef(null);
+  const drawFrameRef      = useRef(null);  // stable ref for rAF restart
+
+  const isPlaying = phase === PHASE.QUESTION
+                 || phase === PHASE.CORRECT
+                 || phase === PHASE.DROPPING;
+  const isPlayingRef = useRef(false);
+  isPlayingRef.current = isPlaying;
 
   // ── Feedback helper ────────────────────────────────────────────────
   function showFeedback(text, good) {
@@ -148,22 +223,20 @@ export default function TubeGame({ getNextQuestion }) {
     if (tube.length < 3) return;
     const top = tube.slice(-3);
     if (top[0].name === top[1].name && top[1].name === top[2].name) {
-      // Capture Y positions before removing so the pop animation knows where to burst
       const baseI = tube.length - 3;
       top.forEach((color, j) => {
         popParticlesRef.current.push({
-          x:        CANVAS_W / 2,
-          y:        TUBE_BOTTOM_Y - (baseI + j) * BALL_STRIDE,
+          x: CANVAS_W / 2,
+          y: TUBE_BOTTOM_Y - (baseI + j) * BALL_STRIDE,
           color,
           progress: 0,
         });
       });
-
       tubeRef.current = tube.slice(0, -3);
       scoreRef.current += 50;
       setScore(scoreRef.current);
       showFeedback('Triple! +50', true);
-      checkAndPopTriple(); // cascade
+      checkAndPopTriple();
     }
   }
 
@@ -197,8 +270,6 @@ export default function TubeGame({ getNextQuestion }) {
   });
 
   // ── Canvas rendering ───────────────────────────────────────────────
-  // The canvas element is ALWAYS in the DOM (just hidden via CSS when not
-  // playing), so this effect finds a valid ref on the very first mount.
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -224,13 +295,18 @@ export default function TubeGame({ getNextQuestion }) {
     }
 
     function drawFrame() {
+      // Pause the loop when nothing is animating and the game is not active
+      if (!isPlayingRef.current && !dropAnimRef.current && !popParticlesRef.current.length) {
+        animRef.current = null;
+        return;
+      }
+
       ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
 
       const ballsInTube = tubeRef.current.length;
       const danger      = ballsInTube >= MAX_BALLS - 2;
       const tubeRight   = TUBE_X + TUBE_W;
 
-      // Tube interior fill (closed path so fill covers the rounded bottom)
       ctx.beginPath();
       ctx.moveTo(TUBE_X, 0);
       ctx.lineTo(TUBE_X, CANVAS_H - CORNER_R);
@@ -239,11 +315,10 @@ export default function TubeGame({ getNextQuestion }) {
       ctx.arcTo(tubeRight, CANVAS_H, tubeRight, CANVAS_H - CORNER_R, CORNER_R);
       ctx.lineTo(tubeRight, 0);
       ctx.closePath();
-      ctx.fillStyle = 'rgba(0, 0, 12, 0.5)';
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
       ctx.fill();
 
-      // Tube wall stroke (open — no top cap)
-      let wallColor = '#c8c8d8';
+      let wallColor = 'rgba(255,255,255,0.5)';
       if (danger) {
         const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 130);
         wallColor = `rgb(${Math.round(220 + 35 * pulse)}, 60, 60)`;
@@ -259,12 +334,10 @@ export default function TubeGame({ getNextQuestion }) {
       ctx.lineWidth = danger ? 4 : 3;
       ctx.stroke();
 
-      // Stacked balls (0 = bottom)
       for (let i = 0; i < ballsInTube; i++) {
         drawBall(CANVAS_W / 2, TUBE_BOTTOM_Y - i * BALL_STRIDE, tubeRef.current[i]);
       }
 
-      // Dropping ball animation
       const anim = dropAnimRef.current;
       if (anim) {
         anim.y += DROP_SPEED;
@@ -274,8 +347,7 @@ export default function TubeGame({ getNextQuestion }) {
         }
       }
 
-      // Pop animation: each cleared ball expands and fades out
-      const POP_SPEED = 0.055; // ~18 frames ≈ 300 ms at 60 fps
+      const POP_SPEED = 0.055;
       const alive = [];
       for (const p of popParticlesRef.current) {
         p.progress += POP_SPEED;
@@ -292,11 +364,22 @@ export default function TubeGame({ getNextQuestion }) {
       animRef.current = requestAnimationFrame(drawFrame);
     }
 
+    drawFrameRef.current = drawFrame;
     animRef.current = requestAnimationFrame(drawFrame);
-    return () => cancelAnimationFrame(animRef.current);
+    return () => {
+      cancelAnimationFrame(animRef.current);
+      animRef.current = null;
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Game logic handlers ────────────────────────────────────────────
+  // Restart the rAF loop when the game becomes active
+  useEffect(() => {
+    if (isPlaying && animRef.current === null && drawFrameRef.current) {
+      animRef.current = requestAnimationFrame(drawFrameRef.current);
+    }
+  }, [isPlaying]);
+
+  // ── Game logic ─────────────────────────────────────────────────────
   function startGame() {
     tubeRef.current         = [];
     scoreRef.current        = 0;
@@ -353,10 +436,6 @@ export default function TubeGame({ getNextQuestion }) {
   }
 
   // ── Render ─────────────────────────────────────────────────────────
-  const isPlaying = phase === PHASE.QUESTION
-                 || phase === PHASE.CORRECT
-                 || phase === PHASE.DROPPING;
-
   return (
     <div className="w-full flex flex-col items-center px-4 py-6">
 
@@ -371,48 +450,98 @@ export default function TubeGame({ getNextQuestion }) {
       )}
 
       {/*
-        Game UI — always rendered in the DOM tree so the canvas ref is valid
-        from the very first mount. The `hidden` class (display:none) keeps the
-        canvas in the DOM without it being visible during MENU / GAME_OVER.
+        Game UI is always in the DOM so the canvas ref stays valid.
+        `hidden` keeps it out of view during MENU / GAME_OVER.
       */}
       <div className={`w-full max-w-2xl flex flex-col items-center gap-4${isPlaying ? '' : ' hidden'}`}>
 
         {/* HUD */}
-        <div className="flex justify-between w-full text-sm">
-          <span className="bg-[#16213e] text-gray-200 px-4 py-1.5 rounded-full border border-white/10">
-            Score <strong className="text-white">{score}</strong>
+        <div
+          className="flex justify-between w-full text-sm"
+          role="region"
+          aria-label="Game stats"
+        >
+          <span
+            className="px-4 py-1.5 rounded-lg border"
+            style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text)' }}
+          >
+            Score{' '}
+            <strong style={{ fontFamily: DISPLAY_FONT, fontSize: '1.1em' }}>{score}</strong>
           </span>
-          <span className={`px-4 py-1.5 rounded-full font-semibold border ${
-            ballCount >= MAX_BALLS - 2
-              ? 'bg-red-900/60 text-red-300 border-red-500/50 animate-pulse'
-              : 'bg-[#16213e] text-gray-200 border-white/10'
-          }`}>
-            Balls <strong className="text-white">{ballCount}</strong>/{MAX_BALLS}
+
+          <span
+            className={`px-4 py-1.5 rounded-lg border font-semibold ${ballCount >= MAX_BALLS - 2 ? 'animate-pulse' : ''}`}
+            style={{
+              backgroundColor: ballCount >= MAX_BALLS - 2
+                ? 'color-mix(in oklch, var(--danger) 20%, transparent)'
+                : 'var(--surface)',
+              color: ballCount >= MAX_BALLS - 2 ? 'oklch(80% 0.22 20)' : 'var(--text)',
+              borderColor: ballCount >= MAX_BALLS - 2
+                ? 'color-mix(in oklch, var(--danger) 50%, transparent)'
+                : 'var(--border)',
+            }}
+            aria-live="polite"
+            aria-label={`${ballCount} of ${MAX_BALLS} balls in tube`}
+          >
+            Balls{' '}
+            <strong style={{ fontFamily: DISPLAY_FONT, fontSize: '1.1em' }}>{ballCount}</strong>
+            /{MAX_BALLS}
           </span>
-          <span className="bg-[#16213e] text-gray-200 px-4 py-1.5 rounded-full border border-white/10">
-            Streak <strong className="text-yellow-300">{streak}</strong>
+
+          <span
+            className="px-4 py-1.5 rounded-lg border"
+            style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text)' }}
+          >
+            Streak{' '}
+            <strong
+              style={{
+                fontFamily: DISPLAY_FONT,
+                fontSize: '1.1em',
+                color: streak > 0 ? 'oklch(82% 0.19 90)' : 'var(--text)',
+              }}
+            >
+              {streak}
+            </strong>
           </span>
         </div>
 
-        {/* Two-column area: [left = question/picker] [right = tube] */}
-        <div className="flex items-start gap-4 w-full">
+        {/* Two-column area: stacked on mobile (canvas top), side-by-side on sm+ */}
+        <div className="flex flex-col-reverse sm:flex-row items-start gap-4 w-full">
 
-          {/* LEFT column */}
+          {/* LEFT column — quiz / color picker */}
           <div className="flex-1 min-w-0 flex flex-col gap-3">
 
-            {feedback && (
-              <div className={`text-sm font-semibold px-3 py-1.5 rounded-xl border ${
-                feedback.good
-                  ? 'text-green-300 bg-green-400/10 border-green-500/30'
-                  : 'text-red-300 bg-red-400/10 border-red-500/30'
-              }`}>
-                {feedback.text}
-              </div>
-            )}
+            {/* aria-live region for answer feedback */}
+            <div role="status" aria-live="polite" aria-atomic="true">
+              {feedback && (
+                <div
+                  className="text-sm font-bold px-3 py-2 rounded-lg border"
+                  style={{
+                    color: feedback.good ? 'var(--success)' : 'var(--danger)',
+                    backgroundColor: feedback.good
+                      ? 'color-mix(in oklch, var(--success) 12%, transparent)'
+                      : 'color-mix(in oklch, var(--danger) 12%, transparent)',
+                    borderColor: feedback.good
+                      ? 'color-mix(in oklch, var(--success) 35%, transparent)'
+                      : 'color-mix(in oklch, var(--danger) 35%, transparent)',
+                  }}
+                >
+                  {feedback.text}
+                </div>
+              )}
+            </div>
 
             {streak >= 2 && (
-              <div className="text-xs text-yellow-300 bg-yellow-400/10 border border-yellow-500/20 px-3 py-1 rounded-xl">
-                {streak >= 3 ? '🔥' : '⚡'} {streak}× streak bonus
+              <div
+                className="text-xs font-semibold px-3 py-1 rounded-lg border"
+                style={{
+                  color: 'oklch(82% 0.19 90)',
+                  backgroundColor: 'oklch(82% 0.19 90 / 0.1)',
+                  borderColor: 'oklch(82% 0.19 90 / 0.25)',
+                }}
+                aria-live="polite"
+              >
+                {streak}× STREAK BONUS
               </div>
             )}
 
@@ -429,21 +558,28 @@ export default function TubeGame({ getNextQuestion }) {
             )}
 
             {phase === PHASE.DROPPING && (
-              <div className="bg-[#16213e] rounded-2xl p-4 border border-white/10 text-center">
-                <p className="text-gray-400 text-sm">Ball dropping…</p>
+              <div
+                className="rounded-xl p-4 border text-center"
+                style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}
+                aria-live="polite"
+              >
+                <p style={{ color: 'var(--muted)' }} className="text-sm">Dropping…</p>
               </div>
             )}
           </div>
 
-          {/* RIGHT column — pending ball + canvas */}
-          <div className="shrink-0 flex flex-col items-center gap-2">
+          {/* RIGHT column — next ball + canvas */}
+          <div className="shrink-0 flex flex-col items-center gap-2 mx-auto sm:mx-0">
             {pendingColor && (
               <div className="flex flex-col items-center gap-1">
-                <span className="text-xs text-gray-500 uppercase tracking-wider">Top of tube</span>
+                <span className="text-xs uppercase tracking-wider" style={{ color: 'var(--muted)' }}>
+                  Next
+                </span>
                 <div
-                  className="w-12 h-12 rounded-full border-4 border-dashed border-white/30
-                             flex items-center justify-center text-xl font-bold"
+                  className="w-10 h-10 rounded-full border-2 border-dashed border-white/30
+                             flex items-center justify-center text-lg font-bold"
                   style={{ backgroundColor: pendingColor.hex, color: pendingColor.text }}
+                  aria-label={`Next ball: ${pendingColor.name}`}
                 >
                   {pendingColor.shape}
                 </div>
@@ -455,6 +591,8 @@ export default function TubeGame({ getNextQuestion }) {
               width={CANVAS_W}
               height={CANVAS_H}
               className="rounded-b-2xl"
+              role="img"
+              aria-label={`Tube: ${ballCount} of ${MAX_BALLS} balls stacked`}
             />
           </div>
 
