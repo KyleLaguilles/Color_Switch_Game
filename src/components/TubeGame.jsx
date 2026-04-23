@@ -118,12 +118,10 @@ function AnimatedTitle() {
 // ── Small inline components ─────────────────────────────────────────
 function MainMenu({ onStart }) {
   return (
-    <>
-      <BallsBackground />
-      <div
-        className="flex flex-col items-center gap-8 py-8 w-full max-w-sm"
-        style={{ position: 'relative', zIndex: 1 }}
-      >
+    <div
+      className="flex flex-col items-center gap-8 py-8 w-full max-w-sm"
+      style={{ position: 'relative', zIndex: 1 }}
+    >
       <div className="text-center">
         <AnimatedTitle />
         <p
@@ -187,7 +185,6 @@ function MainMenu({ onStart }) {
         START GAME
       </button>
     </div>
-    </>
   );
 }
 
@@ -478,6 +475,20 @@ export default function TubeGame({ getNextQuestion }) {
   }, [isPlaying]);
 
   // ── Game logic ─────────────────────────────────────────────────────
+  function goToMenu() {
+    if (animRef.current) {
+      cancelAnimationFrame(animRef.current);
+      animRef.current = null;
+    }
+    dropAnimRef.current     = null;
+    popParticlesRef.current = [];
+    if (feedbackTimerRef.current) {
+      clearTimeout(feedbackTimerRef.current);
+      feedbackTimerRef.current = null;
+    }
+    setPhase(PHASE.MENU);
+  }
+
   function startGame() {
     tubeRef.current         = [];
     scoreRef.current        = 0;
@@ -537,6 +548,8 @@ export default function TubeGame({ getNextQuestion }) {
   return (
     <div className="w-full flex flex-col items-center px-4 py-6">
 
+      <BallsBackground />
+
       {phase === PHASE.MENU && <MainMenu onStart={startGame} />}
 
       {phase === PHASE.GAME_OVER && (
@@ -552,6 +565,17 @@ export default function TubeGame({ getNextQuestion }) {
         `hidden` keeps it out of view during MENU / GAME_OVER.
       */}
       <div className={`w-full max-w-2xl flex flex-col items-center gap-4${isPlaying ? '' : ' hidden'}`}>
+
+        {/* Exit button */}
+        <div className="w-full flex justify-start">
+          <button
+            onClick={goToMenu}
+            className={`text-xs px-3 py-1.5 rounded-lg border transition-all duration-150 hover:brightness-125 active:scale-95 ${FOCUS}`}
+            style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--muted)' }}
+          >
+            ← Menu
+          </button>
+        </div>
 
         {/* HUD */}
         <div
