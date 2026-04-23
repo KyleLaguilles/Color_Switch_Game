@@ -11,7 +11,12 @@ Group 2 Project for COMP380 — Color Switch Game with Trivia Questions
 
 ## Getting started
 
+create a .env file and copy paste:
+VITE_SUPABASE_URL=url_here
+VITE_SUPABASE_ANON_KEY=key_here
+
 ```bash
+npm install @supabase/supabase-js 
 npm install
 npm run dev
 ```

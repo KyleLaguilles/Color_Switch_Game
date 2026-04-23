@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { COLORS, randomColor } from '../constants/colors';
 import { PHASE } from '../constants/phases';
 import QuizModal from './QuizModal';
+import BallsBackground from './BallsBackground';
 
 // ── Canvas constants ────────────────────────────────────────────────
 const CANVAS_W      = 140;
@@ -17,80 +18,6 @@ const CORNER_R      = 14;
 
 const DISPLAY_FONT = "'Big Shoulders Display', sans-serif";
 const FOCUS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60';
-
-// ── Background falling-balls canvas (start screen only) ─────────────
-function BallsBackground() {
-  const bgRef = useRef(null);
-
-  useEffect(() => {
-    const canvas = bgRef.current;
-    const ctx = canvas.getContext('2d');
-
-    function resize() {
-      canvas.width  = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    resize();
-    window.addEventListener('resize', resize);
-
-    function makeBall(w, h, randomY = false) {
-      const color = COLORS[Math.floor(Math.random() * COLORS.length)];
-      return {
-        x:       Math.random() * w,
-        y:       randomY ? Math.random() * h : -(15 + Math.random() * 35),
-        radius:  15 + Math.random() * 20,
-        color:   color.hex,
-        speed:   0.4 + Math.random() * 1.2,
-        opacity: 0.12 + Math.random() * 0.13,
-      };
-    }
-
-    const balls = Array.from({ length: 18 }, () =>
-      makeBall(window.innerWidth, window.innerHeight, true)
-    );
-
-    let animId;
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (const ball of balls) {
-        ball.y += ball.speed;
-        ctx.save();
-        ctx.globalAlpha = ball.opacity;
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-        ctx.fillStyle = ball.color;
-        ctx.fill();
-        ctx.restore();
-        if (ball.y - ball.radius > canvas.height) {
-          Object.assign(ball, makeBall(canvas.width, canvas.height, false));
-        }
-      }
-      animId = requestAnimationFrame(draw);
-    }
-    animId = requestAnimationFrame(draw);
-
-    return () => {
-      cancelAnimationFrame(animId);
-      window.removeEventListener('resize', resize);
-    };
-  }, []);
-
-  return (
-    <canvas
-      ref={bgRef}
-      aria-hidden="true"
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        zIndex: 0,
-        pointerEvents: 'none',
-      }}
-    />
-  );
-}
 
 // ── Color-cycling "COLOR" letters ────────────────────────────────────
 const COLOR_LETTERS = ['C', 'O', 'L', 'O', 'R'];
@@ -116,12 +43,23 @@ function AnimatedTitle() {
 }
 
 // ── Small inline components ─────────────────────────────────────────
-function MainMenu({ onStart }) {
+function MainMenu({ onStart, isGuest, onSignIn, onShowStats }) {
   return (
     <div
       className="flex flex-col items-center gap-8 py-8 w-full max-w-sm"
       style={{ position: 'relative', zIndex: 1 }}
     >
+      {isGuest && (
+        <button
+          type="button"
+          onClick={onSignIn}
+          className={`absolute top-0 right-0 text-xs hover:underline ${FOCUS}`}
+          style={{ color: 'var(--muted)' }}
+        >
+          Sign in / Create account
+        </button>
+      )}
+
       <div className="text-center">
         <AnimatedTitle />
         <p
@@ -176,14 +114,27 @@ function MainMenu({ onStart }) {
         ))}
       </div>
 
-      <button
-        onClick={onStart}
-        className={`active:scale-95 font-black text-xl px-12 py-3 rounded-lg
-                    transition-all duration-150 hover:brightness-110 tracking-wider ${FOCUS}`}
-        style={{ backgroundColor: 'var(--accent)', color: '#000', fontFamily: DISPLAY_FONT }}
-      >
-        START GAME
-      </button>
+      <div className="flex flex-col items-center gap-3">
+        <button
+          onClick={onStart}
+          className={`active:scale-95 font-black text-xl px-12 py-3 rounded-lg
+                      transition-all duration-150 hover:brightness-110 tracking-wider ${FOCUS}`}
+          style={{ backgroundColor: 'var(--accent)', color: '#000', fontFamily: DISPLAY_FONT }}
+        >
+          START GAME
+        </button>
+
+        {!isGuest && (
+          <button
+            onClick={onShowStats}
+            className={`active:scale-95 text-sm font-semibold px-8 py-2 rounded-lg border
+                        transition-all duration-150 hover:brightness-125 ${FOCUS}`}
+            style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--muted)' }}
+          >
+            View Stats
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -219,7 +170,7 @@ function ColorPicker({ onPick }) {
   );
 }
 
-function GameOverScreen({ score, onPlayAgain, onMenu }) {
+function GameOverScreen({ score, onPlayAgain, onMenu, isGuest }) {
   return (
     <div className="flex flex-col items-center gap-8 py-10 w-full max-w-sm text-center">
       <div>
@@ -253,6 +204,12 @@ function GameOverScreen({ score, onPlayAgain, onMenu }) {
         </p>
       </div>
 
+      {isGuest && (
+        <p className="text-sm -mt-4" style={{ color: 'var(--muted)' }}>
+          Sign up to save your stats and create custom question sets
+        </p>
+      )}
+
       <div className="flex gap-3">
         <button
           onClick={onPlayAgain}
@@ -276,7 +233,7 @@ function GameOverScreen({ score, onPlayAgain, onMenu }) {
 }
 
 // ── Main component ───────────────────────────────────────────────────
-export default function TubeGame({ getNextQuestion }) {
+export default function TubeGame({ getNextQuestion, isGuest = false, user = null, onSignIn, onGameOver, onShowStats }) {
   // ── React state ───────────────────────────────────────────────────
   const [phase, setPhase]                     = useState(PHASE.MENU);
   const [score, setScore]                     = useState(0);
@@ -298,6 +255,7 @@ export default function TubeGame({ getNextQuestion }) {
   const onDropCompleteRef = useRef(null);
   const feedbackTimerRef  = useRef(null);
   const drawFrameRef      = useRef(null);  // stable ref for rAF restart
+  const attemptsRef       = useRef([]);
 
   const isPlaying = phase === PHASE.QUESTION
                  || phase === PHASE.CORRECT
@@ -347,6 +305,7 @@ export default function TubeGame({ getNextQuestion }) {
 
     if (tubeRef.current.length >= MAX_BALLS) {
       setPhase(PHASE.GAME_OVER);
+      onGameOver?.(scoreRef.current, [...attemptsRef.current]);
       return;
     }
 
@@ -495,6 +454,7 @@ export default function TubeGame({ getNextQuestion }) {
     streakRef.current       = 0;
     dropAnimRef.current     = null;
     popParticlesRef.current = [];
+    attemptsRef.current     = [];
     setScore(0);
     setStreak(0);
     setBallCount(0);
@@ -519,6 +479,7 @@ export default function TubeGame({ getNextQuestion }) {
   }
 
   function handleCorrectAnswer() {
+    attemptsRef.current.push({ category: currentQuestion?.category ?? null, was_correct: true });
     streakRef.current += 1;
     const bonus = 10 + streakRef.current * 2;
     scoreRef.current += bonus;
@@ -529,6 +490,7 @@ export default function TubeGame({ getNextQuestion }) {
   }
 
   function handleWrongAnswer() {
+    attemptsRef.current.push({ category: currentQuestion?.category ?? null, was_correct: false });
     streakRef.current = 0;
     setStreak(0);
     showFeedback('Wrong!', false);
@@ -550,13 +512,14 @@ export default function TubeGame({ getNextQuestion }) {
 
       <BallsBackground />
 
-      {phase === PHASE.MENU && <MainMenu onStart={startGame} />}
+      {phase === PHASE.MENU && <MainMenu onStart={startGame} isGuest={isGuest} onSignIn={onSignIn} onShowStats={onShowStats} />}
 
       {phase === PHASE.GAME_OVER && (
         <GameOverScreen
           score={score}
           onPlayAgain={startGame}
           onMenu={() => setPhase(PHASE.MENU)}
+          isGuest={isGuest}
         />
       )}
 
