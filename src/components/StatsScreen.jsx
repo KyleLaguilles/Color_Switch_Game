@@ -2,22 +2,12 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import BallsBackground from './BallsBackground';
 
-const DISPLAY_FONT = "'Big Shoulders Display', sans-serif";
-const FOCUS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60';
-
 function StatCard({ label, value, sub }) {
   return (
-    <div
-      className="rounded-xl p-4 text-center flex flex-col items-center gap-1"
-      style={{ background: 'var(--raised)', border: '1px solid var(--border)' }}
-    >
-      <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>
-        {label}
-      </p>
-      <p className="text-3xl font-black leading-none" style={{ fontFamily: DISPLAY_FONT, color: 'var(--accent)' }}>
-        {value}
-      </p>
-      {sub && <p className="text-xs" style={{ color: 'var(--muted)' }}>{sub}</p>}
+    <div className="neon-card" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+      <span className="hud-label">{label}</span>
+      <span className="hud-value" style={{ color: 'var(--accent)', fontSize: 22 }}>{value}</span>
+      {sub && <p style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--muted)' }}>{sub}</p>}
     </div>
   );
 }
@@ -25,10 +15,9 @@ function StatCard({ label, value, sub }) {
 function PctBar({ pct }) {
   const color = pct >= 70 ? 'var(--success)' : pct >= 40 ? 'var(--accent)' : 'var(--danger)';
   return (
-    <div className="h-1.5 w-full rounded-full" style={{ background: 'var(--raised)' }}>
+    <div style={{ height: 6, width: '100%', borderRadius: 3, background: 'var(--raised)' }}>
       <div
-        className="h-full rounded-full"
-        style={{ width: `${pct}%`, background: color, transition: 'width 0.4s ease' }}
+        style={{ height: '100%', borderRadius: 3, width: `${pct}%`, background: color, transition: 'width 0.4s ease' }}
       />
     </div>
   );
@@ -66,9 +55,7 @@ export default function StatsScreen({ user, onBack }) {
       }
       const categories = Object.entries(catMap)
         .map(([name, { total, correct }]) => ({
-          name,
-          total,
-          correct,
+          name, total, correct,
           pct: Math.round((correct / total) * 100),
         }))
         .sort((a, b) => b.total - a.total);
@@ -81,39 +68,48 @@ export default function StatsScreen({ user, onBack }) {
   }, [user.id]);
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center px-4 py-6 overflow-y-auto">
+    <div
+      className="w-full min-h-screen flex flex-col items-center px-4 py-6 game-scroll animate-scan-in"
+      style={{ position: 'relative' }}
+    >
       <BallsBackground />
 
-      <div className="w-full max-w-sm flex flex-col gap-6" style={{ position: 'relative', zIndex: 1 }}>
+      <div className="w-full flex flex-col gap-6" style={{ maxWidth: 400, position: 'relative', zIndex: 1 }}>
 
         {/* Header */}
-        <div className="flex items-center gap-3 pt-2">
-          <button
-            onClick={onBack}
-            className={`text-xs px-3 py-1.5 rounded-lg border transition-all hover:brightness-125 active:scale-95 ${FOCUS}`}
-            style={{ background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--muted)' }}
-          >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, paddingTop: 8 }}>
+          <button onClick={onBack} className="btn-ghost" style={{ fontSize: 11, padding: '6px 14px' }}>
             ← Back
           </button>
-          <h2
-            className="text-2xl font-black uppercase tracking-wider"
-            style={{ fontFamily: DISPLAY_FONT, color: 'var(--text)' }}
-          >
-            Your Stats
+          <h2 style={{
+            fontFamily: 'var(--font-pixel)',
+            fontSize: 14,
+            color: 'var(--text)',
+            letterSpacing: '0.08em',
+          }}>
+            YOUR STATS
           </h2>
         </div>
 
         {loading && (
-          <p className="text-sm text-center py-12" style={{ color: 'var(--muted)' }}>Loading…</p>
+          <p style={{
+            fontFamily: 'var(--font-pixel)',
+            fontSize: 9,
+            color: 'var(--muted)',
+            textAlign: 'center',
+            padding: '48px 0',
+            animation: 'glowPulse 1.2s ease-in-out infinite',
+          }}>
+            LOADING...
+          </p>
         )}
 
         {!loading && stats.total === 0 && (
-          <div
-            className="rounded-xl p-8 text-center border"
-            style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
-          >
-            <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>No games yet</p>
-            <p className="text-sm mt-1" style={{ color: 'var(--muted)' }}>
+          <div className="retro-card" style={{ textAlign: 'center', padding: 32 }}>
+            <p style={{ fontFamily: 'var(--font-pixel)', fontSize: 9, color: 'var(--text)', marginBottom: 8 }}>
+              NO GAMES YET
+            </p>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--muted)' }}>
               Play a game to see your stats here.
             </p>
           </div>
@@ -122,12 +118,12 @@ export default function StatsScreen({ user, onBack }) {
         {!loading && stats.total > 0 && (
           <>
             {/* Summary grid */}
-            <div className="grid grid-cols-2 gap-3">
-              <StatCard label="Games Played" value={stats.total} />
-              <StatCard label="High Score"   value={stats.highScore} />
-              <StatCard label="Avg Score"    value={stats.avgScore} />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <StatCard label="GAMES PLAYED" value={stats.total} />
+              <StatCard label="HIGH SCORE"   value={stats.highScore} />
+              <StatCard label="AVG SCORE"    value={stats.avgScore} />
               <StatCard
-                label="Correct"
+                label="CORRECT"
                 value={`${stats.overallPct}%`}
                 sub={`${stats.correctQ} / ${stats.totalQ} answered`}
               />
@@ -135,30 +131,46 @@ export default function StatsScreen({ user, onBack }) {
 
             {/* Category breakdown */}
             {stats.categories.length > 0 && (
-              <div
-                className="rounded-xl border overflow-hidden"
-                style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
-              >
-                <p
-                  className="text-xs font-bold uppercase tracking-widest px-4 pt-4 pb-3"
-                  style={{ color: 'var(--accent)' }}
-                >
-                  By Category
+              <div className="retro-card" style={{ padding: 0, overflow: 'hidden' }}>
+                <p style={{
+                  fontFamily: 'var(--font-pixel)',
+                  fontSize: 8,
+                  color: 'var(--accent)',
+                  letterSpacing: '0.12em',
+                  padding: '14px 16px 10px',
+                }}>
+                  BY CATEGORY
                 </p>
-                <div className="flex flex-col">
+                <div>
                   {stats.categories.map((cat, i) => (
                     <div
                       key={cat.name}
-                      className="px-4 py-3 flex flex-col gap-2"
                       style={{
+                        padding: '10px 16px',
                         borderTop: i > 0 ? '1px solid var(--border)' : 'none',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 6,
                       }}
                     >
-                      <div className="flex justify-between items-baseline gap-2">
-                        <span className="text-xs font-medium truncate" style={{ color: 'var(--text)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
+                        <span style={{
+                          fontFamily: 'var(--font-body)',
+                          fontSize: 12,
+                          fontWeight: 600,
+                          color: 'var(--text)',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}>
                           {cat.name}
                         </span>
-                        <span className="text-xs shrink-0 tabular-nums" style={{ color: 'var(--muted)' }}>
+                        <span style={{
+                          fontFamily: 'var(--font-pixel)',
+                          fontSize: 7,
+                          color: 'var(--muted)',
+                          flexShrink: 0,
+                        }}>
                           {cat.correct}/{cat.total} · {cat.pct}%
                         </span>
                       </div>
@@ -169,8 +181,7 @@ export default function StatsScreen({ user, onBack }) {
               </div>
             )}
 
-            {/* Bottom padding so last item clears the screen */}
-            <div className="h-6" />
+            <div style={{ height: 24 }} />
           </>
         )}
       </div>

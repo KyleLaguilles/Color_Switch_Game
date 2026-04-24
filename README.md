@@ -9,7 +9,7 @@ Group 2 Project for COMP380 — Color Switch Game with Trivia Questions
 - **Canvas API** — tube and ball rendering (no external game libraries)
 - **Supabase** — authentication and stats storage (PostgreSQL + Auth)
 - **Vercel** — hosting and deployment
-- **questions.json** — 50 local trivia questions
+- **questions.json** — 300 local trivia questions
 
 ## Getting started
 

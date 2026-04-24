@@ -9,15 +9,14 @@ function shuffle(arr) {
   return a;
 }
 
-const DIFFICULTY = {
-  easy:   { color: 'var(--success)',                                    bg: 'color-mix(in oklch, var(--success) 12%, transparent)'  },
-  medium: { color: 'oklch(82% 0.19 90)',                                bg: 'oklch(82% 0.19 90 / 0.12)'                             },
-  hard:   { color: 'var(--danger)',                                     bg: 'color-mix(in oklch, var(--danger) 12%, transparent)'   },
+const DIFF_COLORS = {
+  easy:   { color: 'var(--success)', bg: 'rgba(46,204,113,0.12)',  border: 'rgba(46,204,113,0.4)' },
+  medium: { color: '#f39c12',        bg: 'rgba(243,156,18,0.12)',  border: 'rgba(243,156,18,0.4)' },
+  hard:   { color: 'var(--danger)',  bg: 'rgba(231,76,60,0.12)',   border: 'rgba(231,76,60,0.4)'  },
 };
 
-const FOCUS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60';
+const ANSWER_KEYS = ['A', 'B', 'C', 'D'];
 
-// Inline card — parent controls when this is mounted.
 export default function QuizModal({ question, onCorrect, onWrong }) {
   const [shuffledAnswers, setShuffledAnswers] = useState([]);
   const [selected, setSelected]               = useState(null);
@@ -42,89 +41,95 @@ export default function QuizModal({ question, onCorrect, onWrong }) {
     }, 900);
   }
 
-  function getAnswerStyle(answer) {
-    if (!revealed) {
-      return {
-        backgroundColor: 'var(--raised)',
-        borderColor: 'var(--border)',
-        color: 'var(--text)',
-      };
-    }
+  function getAnswerOverride(answer) {
+    if (!revealed) return {};
     if (answer === question.correct_answer) {
       return {
-        backgroundColor: 'color-mix(in oklch, var(--success) 18%, transparent)',
-        borderColor: 'color-mix(in oklch, var(--success) 65%, transparent)',
-        color: 'oklch(82% 0.14 148)',
+        borderColor: '#2ecc71',
+        background: 'rgba(46,204,113,0.12)',
+        color: '#7fffc4',
+        boxShadow: '0 0 10px rgba(46,204,113,0.3)',
       };
     }
     if (answer === selected) {
       return {
-        backgroundColor: 'color-mix(in oklch, var(--danger) 18%, transparent)',
-        borderColor: 'color-mix(in oklch, var(--danger) 65%, transparent)',
-        color: 'oklch(78% 0.16 20)',
+        borderColor: '#e74c3c',
+        background: 'rgba(231,76,60,0.12)',
+        color: '#ff9090',
+        boxShadow: '0 0 10px rgba(231,76,60,0.3)',
       };
     }
-    return {
-      backgroundColor: 'transparent',
-      borderColor: 'oklch(100% 0 0 / 0.05)',
-      color: 'var(--muted)',
-      opacity: '0.45',
-    };
+    return { opacity: 0.35 };
   }
 
-  const diff = DIFFICULTY[question.difficulty] ?? DIFFICULTY.medium;
+  const diff = DIFF_COLORS[question.difficulty] ?? DIFF_COLORS.medium;
 
   return (
     <div
-      className="rounded-xl p-4 border shadow-xl w-full"
-      style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}
+      className="retro-card animate-drop-in w-full"
       role="region"
       aria-label="Trivia question"
     >
-      <div className="flex items-center justify-between mb-3">
-        <span
-          className="text-xs uppercase tracking-widest truncate mr-2"
-          style={{ color: 'var(--muted)' }}
-        >
+      {/* Header row */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <span style={{
+          fontFamily: 'var(--font-body)',
+          fontSize: 10,
+          color: 'var(--muted)',
+          fontWeight: 600,
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          marginRight: 8,
+        }}>
           {question.category}
         </span>
-        <span
-          className="text-xs font-bold px-2 py-0.5 rounded-full capitalize shrink-0"
-          style={{ color: diff.color, backgroundColor: diff.bg }}
-        >
+        <span style={{
+          fontFamily: 'var(--font-pixel)',
+          fontSize: 7,
+          padding: '3px 8px',
+          background: diff.bg,
+          color: diff.color,
+          border: `1px solid ${diff.border}`,
+          borderRadius: 3,
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+          flexShrink: 0,
+        }}>
           {question.difficulty}
         </span>
       </div>
 
-      <p
-        className="text-sm leading-relaxed mb-4"
-        style={{ color: 'var(--text)' }}
-      >
+      {/* Question text */}
+      <p style={{
+        fontFamily: 'var(--font-body)',
+        fontSize: 13,
+        lineHeight: 1.6,
+        color: 'var(--text)',
+        fontWeight: 600,
+        marginBottom: 14,
+      }}>
         {question.question}
       </p>
 
-      <div
-        className="flex flex-col gap-2"
-        role="group"
-        aria-label="Answer choices"
-      >
-        {shuffledAnswers.map(answer => (
+      {/* Answer buttons */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }} role="group" aria-label="Answer choices">
+        {shuffledAnswers.map((answer, i) => (
           <button
             key={answer}
             onClick={() => handleSelect(answer)}
-            aria-disabled={revealed ? 'true' : undefined}
+            disabled={revealed}
             aria-label={
-              revealed && answer === question.correct_answer
-                ? `${answer} — correct`
-                : revealed && answer === selected
-                ? `${answer} — incorrect`
-                : answer
+              revealed && answer === question.correct_answer ? `${answer} — correct`
+              : revealed && answer === selected ? `${answer} — incorrect`
+              : answer
             }
-            className={`border-2 rounded-xl px-3 py-2.5 text-sm font-medium
-                        transition-all duration-200 w-full text-left ${FOCUS}
-                        ${!revealed ? 'cursor-pointer hover:brightness-125' : 'cursor-default'}`}
-            style={getAnswerStyle(answer)}
+            className="answer-btn"
+            style={getAnswerOverride(answer)}
           >
+            <span className="answer-key">{ANSWER_KEYS[i]}</span>
             {answer}
           </button>
         ))}
