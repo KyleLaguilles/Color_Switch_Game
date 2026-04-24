@@ -6,20 +6,24 @@ import BallsBackground from './BallsBackground';
 import SpillAnimation from './SpillAnimation';
 
 // ── Canvas constants ────────────────────────────────────────────────
-const CANVAS_W      = 140;
-const CANVAS_H      = 380;
-const TUBE_X        = 20;
-const TUBE_W        = 100;
-const BALL_RADIUS   = 14;
-const BALL_STRIDE   = 32;
+const CANVAS_W = 140;
+const CANVAS_H = 380;
+const TUBE_X = 20;
+const TUBE_W = 100;
+const BALL_RADIUS = 14;
+const BALL_STRIDE = 32;
 const TUBE_BOTTOM_Y = CANVAS_H - 20;
-const DROP_SPEED    = 10;
-const MAX_BALLS     = 10;
-const CORNER_R      = 14;
+const DROP_SPEED = 10;
+const MAX_BALLS = 10;
+const CORNER_R = 14;
 
 const DISPLAY_FONT = "'Big Shoulders Display', sans-serif";
 const FOCUS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60';
-
+function getDifficultyFromStreak(streak) {
+  if (streak >= 5) return 'hard';
+  if (streak >= 3) return 'medium';
+  return 'easy';
+}
 // ── Color-cycling title ─────────────────────────────────────────────
 const COLOR_LETTERS = ['C', 'O', 'L', 'O', 'R'];
 
@@ -230,35 +234,35 @@ function GameOverScreen({ score, onPlayAgain, onMenu, isGuest }) {
 // ── Main component ───────────────────────────────────────────────────
 export default function TubeGame({ getNextQuestion, isGuest = false, user = null, onSignIn, onSignOut, onGameOver, onShowStats }) {
   // ── React state ───────────────────────────────────────────────────
-  const [phase, setPhase]                     = useState(PHASE.MENU);
-  const [score, setScore]                     = useState(0);
-  const [streak, setStreak]                   = useState(0);
-  const [ballCount, setBallCount]             = useState(0);
+  const [phase, setPhase] = useState(PHASE.MENU);
+  const [score, setScore] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [ballCount, setBallCount] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(null);
-  const [pendingColor, setPendingColor]       = useState(null);
-  const [feedback, setFeedback]               = useState(null);
-  const [gameOverStage, setGameOverStage]     = useState(null); // null | 'shake' | 'spill'
-  const [spillColors, setSpillColors]         = useState(null);
-  const [spillRect,   setSpillRect]           = useState(null);
+  const [pendingColor, setPendingColor] = useState(null);
+  const [feedback, setFeedback] = useState(null);
+  const [gameOverStage, setGameOverStage] = useState(null); // null | 'shake' | 'spill'
+  const [spillColors, setSpillColors] = useState(null);
+  const [spillRect, setSpillRect] = useState(null);
 
   // ── Refs ───────────────────────────────────────────────────────────
-  const canvasRef         = useRef(null);
+  const canvasRef = useRef(null);
   const gameOverTimersRef = useRef([]);
-  const tubeRef           = useRef([]);
-  const scoreRef          = useRef(0);
-  const streakRef         = useRef(0);
-  const pendingRef        = useRef(null);
-  const animRef           = useRef(null);
-  const dropAnimRef       = useRef(null);
-  const popParticlesRef   = useRef([]);
+  const tubeRef = useRef([]);
+  const scoreRef = useRef(0);
+  const streakRef = useRef(0);
+  const pendingRef = useRef(null);
+  const animRef = useRef(null);
+  const dropAnimRef = useRef(null);
+  const popParticlesRef = useRef([]);
   const onDropCompleteRef = useRef(null);
-  const feedbackTimerRef  = useRef(null);
-  const drawFrameRef      = useRef(null);
-  const attemptsRef       = useRef([]);
+  const feedbackTimerRef = useRef(null);
+  const drawFrameRef = useRef(null);
+  const attemptsRef = useRef([]);
 
   const isPlaying = phase === PHASE.QUESTION
-                 || phase === PHASE.CORRECT
-                 || phase === PHASE.DROPPING;
+    || phase === PHASE.CORRECT
+    || phase === PHASE.DROPPING;
   const isPlayingRef = useRef(false);
   isPlayingRef.current = isPlaying;
 
@@ -322,7 +326,8 @@ export default function TubeGame({ getNextQuestion, isGuest = false, user = null
       return; // phase stays DROPPING so canvas loop keeps running
     }
 
-    const q = getNextQuestion();
+    const nextDifficulty = getDifficultyFromStreak(streakRef.current);
+    const q = getNextQuestion(nextDifficulty);
     setCurrentQuestion(q);
     const nextColor = tubeRef.current.length > 0
       ? tubeRef.current[tubeRef.current.length - 1]
@@ -345,7 +350,7 @@ export default function TubeGame({ getNextQuestion, isGuest = false, user = null
     function drawBall(x, y, color, radius = BALL_RADIUS) {
       ctx.save();
       ctx.shadowColor = color.hex;
-      ctx.shadowBlur  = 14;
+      ctx.shadowBlur = 14;
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.fillStyle = color.hex;
@@ -373,8 +378,8 @@ export default function TubeGame({ getNextQuestion, isGuest = false, user = null
       ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
 
       const ballsInTube = tubeRef.current.length;
-      const danger      = ballsInTube >= MAX_BALLS - 2;
-      const tubeRight   = TUBE_X + TUBE_W;
+      const danger = ballsInTube >= MAX_BALLS - 2;
+      const tubeRight = TUBE_X + TUBE_W;
 
       ctx.beginPath();
       ctx.moveTo(TUBE_X, 0);
@@ -394,7 +399,7 @@ export default function TubeGame({ getNextQuestion, isGuest = false, user = null
         wallColor = `rgba(231, ${Math.round(30 + 30 * pulse)}, 60, ${0.7 + 0.3 * pulse})`;
         wallWidth = 3;
         ctx.shadowColor = '#e74c3c';
-        ctx.shadowBlur  = 12 * pulse;
+        ctx.shadowBlur = 12 * pulse;
       }
       ctx.beginPath();
       ctx.moveTo(TUBE_X, 0);
@@ -404,7 +409,7 @@ export default function TubeGame({ getNextQuestion, isGuest = false, user = null
       ctx.arcTo(tubeRight, CANVAS_H, tubeRight, CANVAS_H - CORNER_R, CORNER_R);
       ctx.lineTo(tubeRight, 0);
       ctx.strokeStyle = wallColor;
-      ctx.lineWidth   = wallWidth;
+      ctx.lineWidth = wallWidth;
       ctx.stroke();
       ctx.shadowBlur = 0;
 
@@ -463,7 +468,7 @@ export default function TubeGame({ getNextQuestion, isGuest = false, user = null
       cancelAnimationFrame(animRef.current);
       animRef.current = null;
     }
-    dropAnimRef.current     = null;
+    dropAnimRef.current = null;
     popParticlesRef.current = [];
     if (feedbackTimerRef.current) {
       clearTimeout(feedbackTimerRef.current);
@@ -478,12 +483,12 @@ export default function TubeGame({ getNextQuestion, isGuest = false, user = null
     setGameOverStage(null);
     setSpillColors(null);
     setSpillRect(null);
-    tubeRef.current         = [];
-    scoreRef.current        = 0;
-    streakRef.current       = 0;
-    dropAnimRef.current     = null;
+    tubeRef.current = [];
+    scoreRef.current = 0;
+    streakRef.current = 0;
+    dropAnimRef.current = null;
     popParticlesRef.current = [];
-    attemptsRef.current     = [];
+    attemptsRef.current = [];
     setScore(0);
     setStreak(0);
     setBallCount(0);
@@ -493,7 +498,8 @@ export default function TubeGame({ getNextQuestion, isGuest = false, user = null
     pendingRef.current = firstColor;
     setPendingColor(firstColor);
 
-    const q = getNextQuestion();
+    const firstDifficulty = getDifficultyFromStreak(streakRef.current);
+    const q = getNextQuestion(firstDifficulty);
     setCurrentQuestion(q);
     setPhase(PHASE.QUESTION);
   }
