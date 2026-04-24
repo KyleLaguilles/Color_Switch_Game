@@ -43,7 +43,7 @@ function AnimatedTitle() {
 }
 
 // ── Small inline components ─────────────────────────────────────────
-function MainMenu({ onStart, isGuest, onSignIn, onShowStats }) {
+function MainMenu({ onStart, isGuest, onSignIn, onSignOut, onShowStats }) {
   return (
     <div
       className="flex flex-col items-center gap-8 py-8 w-full max-w-sm"
@@ -57,6 +57,16 @@ function MainMenu({ onStart, isGuest, onSignIn, onShowStats }) {
           style={{ color: 'var(--muted)' }}
         >
           Sign in / Create account
+        </button>
+      )}
+      {!isGuest && (
+        <button
+          type="button"
+          onClick={onSignOut}
+          className={`absolute top-0 right-0 text-xs hover:underline ${FOCUS}`}
+          style={{ color: 'var(--muted)' }}
+        >
+          Sign out
         </button>
       )}
 
@@ -233,7 +243,7 @@ function GameOverScreen({ score, onPlayAgain, onMenu, isGuest }) {
 }
 
 // ── Main component ───────────────────────────────────────────────────
-export default function TubeGame({ getNextQuestion, isGuest = false, user = null, onSignIn, onGameOver, onShowStats }) {
+export default function TubeGame({ getNextQuestion, isGuest = false, user = null, onSignIn, onSignOut, onGameOver, onShowStats }) {
   // ── React state ───────────────────────────────────────────────────
   const [phase, setPhase]                     = useState(PHASE.MENU);
   const [score, setScore]                     = useState(0);
@@ -512,7 +522,7 @@ export default function TubeGame({ getNextQuestion, isGuest = false, user = null
 
       <BallsBackground />
 
-      {phase === PHASE.MENU && <MainMenu onStart={startGame} isGuest={isGuest} onSignIn={onSignIn} onShowStats={onShowStats} />}
+      {phase === PHASE.MENU && <MainMenu onStart={startGame} isGuest={isGuest} onSignIn={onSignIn} onSignOut={onSignOut} onShowStats={onShowStats} />}
 
       {phase === PHASE.GAME_OVER && (
         <GameOverScreen

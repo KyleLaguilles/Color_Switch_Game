@@ -84,6 +84,7 @@ export default function App() {
         isGuest={isGuest}
         user={session?.user ?? null}
         onSignIn={() => setIsGuest(false)}
+        onSignOut={() => supabase.auth.signOut()}
         onGameOver={handleGameOver}
         onShowStats={() => setScreen('stats')}
       />
