@@ -7,7 +7,9 @@ Group 2 Project for COMP380 — Color Switch Game with Trivia Questions
 - **Vite 6** — dev server and build tool
 - **Tailwind CSS 4** — styling for all UI outside the canvas
 - **Canvas API** — tube and ball rendering (no external game libraries)
-- **questions.json** — 50 local trivia questions (no backend)
+- **Supabase** — authentication and stats storage (PostgreSQL + Auth)
+- **Vercel** — hosting and deployment
+- **questions.json** — 50 local trivia questions
 
 ## Getting started
 
