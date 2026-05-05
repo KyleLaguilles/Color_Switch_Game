@@ -58,7 +58,7 @@ function AnimatedTitle() {
 }
 
 // ── Main Menu ───────────────────────────────────────────────────────
-function MainMenu({ onStart, isGuest, onSignIn, onSignOut, onShowStats }) {
+function MainMenu({ onStart, isGuest, onSignIn, onSignOut, onShowStats, onShowMySets }) {
   return (
     <div
       className="flex flex-col items-center gap-8 py-8 w-full animate-scan-in"
@@ -125,6 +125,12 @@ function MainMenu({ onStart, isGuest, onSignIn, onSignOut, onShowStats }) {
         <button onClick={onStart} className={`btn-neon ${FOCUS}`}>
           START GAME
         </button>
+
+        {!isGuest && (
+          <button onClick={onShowMySets} className={`btn-ghost ${FOCUS}`}>
+            My Question Sets
+          </button>
+        )}
 
         {!isGuest && (
           <button onClick={onShowStats} className={`btn-ghost ${FOCUS}`}>
@@ -232,7 +238,7 @@ function GameOverScreen({ score, onPlayAgain, onMenu, isGuest }) {
 }
 
 // ── Main component ───────────────────────────────────────────────────
-export default function TubeGame({ getNextQuestion, isGuest = false, user = null, onSignIn, onSignOut, onGameOver, onShowStats }) {
+export default function TubeGame({ getNextQuestion, isGuest = false, user = null, onSignIn, onSignOut, onGameOver, onShowStats, onShowMySets }) {
   // ── React state ───────────────────────────────────────────────────
   const [phase, setPhase] = useState(PHASE.MENU);
   const [score, setScore] = useState(0);
@@ -514,7 +520,7 @@ export default function TubeGame({ getNextQuestion, isGuest = false, user = null
   }
 
   function handleCorrectAnswer() {
-    attemptsRef.current.push({ category: currentQuestion?.category ?? null, was_correct: true });
+    attemptsRef.current.push({ category: currentQuestion?.category ?? null, question_id: currentQuestion?.id ?? null, was_correct: true });
     streakRef.current += 1;
     const bonus = 10 + streakRef.current * 2;
     scoreRef.current += bonus;
@@ -525,7 +531,7 @@ export default function TubeGame({ getNextQuestion, isGuest = false, user = null
   }
 
   function handleWrongAnswer() {
-    attemptsRef.current.push({ category: currentQuestion?.category ?? null, was_correct: false });
+    attemptsRef.current.push({ category: currentQuestion?.category ?? null, question_id: currentQuestion?.id ?? null, was_correct: false });
     streakRef.current = 0;
     setStreak(0);
     showFeedback('Wrong!', false);
@@ -560,6 +566,7 @@ export default function TubeGame({ getNextQuestion, isGuest = false, user = null
           onSignIn={onSignIn}
           onSignOut={onSignOut}
           onShowStats={onShowStats}
+          onShowMySets={onShowMySets}
         />
       )}
 
