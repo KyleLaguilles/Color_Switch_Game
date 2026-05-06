@@ -29,9 +29,11 @@ export default function StatsScreen({ user, onBack }) {
 
   useEffect(() => {
     async function load() {
-      const [{ data: sessions }, { data: attempts }] = await Promise.all([
-        supabase.from('game_sessions').select('score').eq('user_id', user.id),
-        supabase.from('question_attempts').select('category, was_correct').eq('user_id', user.id),
+      const [{ data: sessions }, { data: attempts }, { data: customSets }, { data: customQs }] = await Promise.all([
+        supabase.from('game_sessions').select('score, mode').eq('user_id', user.id),
+        supabase.from('question_attempts').select('category, was_correct, question_id').eq('user_id', user.id),
+        supabase.from('question_sets').select('id, name').eq('user_id', user.id),
+        supabase.from('questions').select('id, set_id').eq('user_id', user.id).eq('is_default', false),
       ]);
 
       const allSessions = sessions ?? [];
@@ -60,7 +62,42 @@ export default function StatsScreen({ user, onBack }) {
         }))
         .sort((a, b) => b.total - a.total);
 
-      setStats({ total, highScore, avgScore, overallPct, totalQ, correctQ, categories });
+      // Custom set stats
+      const qidToSetId = {};
+      for (const q of (customQs ?? [])) qidToSetId[q.id] = q.set_id;
+
+      const setIdToName = {};
+      for (const s of (customSets ?? [])) setIdToName[s.id] = s.name;
+
+      const setNameToPlays = {};
+      for (const s of (customSets ?? [])) setNameToPlays[s.name] = 0;
+      for (const sess of allSessions) {
+        if (sess.mode && sess.mode !== 'classic' && Object.prototype.hasOwnProperty.call(setNameToPlays, sess.mode)) {
+          setNameToPlays[sess.mode]++;
+        }
+      }
+
+      const setIdToAttempts = {};
+      for (const a of allAttempts) {
+        if (a.question_id && qidToSetId[a.question_id]) {
+          const sid = qidToSetId[a.question_id];
+          if (!setIdToAttempts[sid]) setIdToAttempts[sid] = { total: 0, correct: 0 };
+          setIdToAttempts[sid].total++;
+          if (a.was_correct) setIdToAttempts[sid].correct++;
+        }
+      }
+
+      const customSetStats = (customSets ?? [])
+        .map((s) => {
+          const plays = setNameToPlays[s.name] ?? 0;
+          const att = setIdToAttempts[s.id] ?? { total: 0, correct: 0 };
+          const pct = att.total > 0 ? Math.round((att.correct / att.total) * 100) : null;
+          return { id: s.id, name: s.name, plays, total: att.total, correct: att.correct, pct };
+        })
+        .filter((s) => s.plays > 0 || s.total > 0)
+        .sort((a, b) => b.plays - a.plays);
+
+      setStats({ total, highScore, avgScore, overallPct, totalQ, correctQ, categories, customSetStats, hasCustomSets: (customSets ?? []).length > 0 });
       setLoading(false);
     }
 
@@ -178,6 +215,70 @@ export default function StatsScreen({ user, onBack }) {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Custom set stats */}
+            {stats.hasCustomSets && (
+              <div className="retro-card" style={{ padding: 0, overflow: 'hidden' }}>
+                <p style={{
+                  fontFamily: 'var(--font-pixel)',
+                  fontSize: 8,
+                  color: 'var(--accent)',
+                  letterSpacing: '0.12em',
+                  padding: '14px 16px 10px',
+                }}>
+                  BY QUESTION SET
+                </p>
+
+                {stats.customSetStats.length === 0 && (
+                  <p style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 12,
+                    color: 'var(--muted)',
+                    padding: '0 16px 16px',
+                    fontStyle: 'italic',
+                  }}>
+                    No custom sets played yet.
+                  </p>
+                )}
+
+                {stats.customSetStats.map((s, i) => (
+                  <div
+                    key={s.id}
+                    style={{
+                      padding: '10px 16px',
+                      borderTop: i > 0 ? '1px solid var(--border)' : '1px solid var(--border)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 6,
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
+                      <span style={{
+                        fontFamily: 'var(--font-body)',
+                        fontSize: 12,
+                        fontWeight: 600,
+                        color: 'var(--text)',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}>
+                        {s.name}
+                      </span>
+                      <span style={{
+                        fontFamily: 'var(--font-pixel)',
+                        fontSize: 7,
+                        color: 'var(--muted)',
+                        flexShrink: 0,
+                      }}>
+                        {s.plays} {s.plays === 1 ? 'play' : 'plays'}
+                        {s.pct !== null && ` · ${s.pct}%`}
+                      </span>
+                    </div>
+                    {s.pct !== null && <PctBar pct={s.pct} />}
+                  </div>
+                ))}
               </div>
             )}
 
