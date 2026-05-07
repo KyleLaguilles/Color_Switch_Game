@@ -17,7 +17,7 @@ const DROP_SPEED = 10;
 const MAX_BALLS = 10;
 const CORNER_R = 14;
 
-const DISPLAY_FONT = "'Big Shoulders Display', sans-serif";
+const DISPLAY_FONT = 'var(--font-display)';
 const FOCUS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60';
 function getDifficultyFromStreak(streak) {
   if (streak >= 5) return 'hard';
@@ -627,7 +627,7 @@ export default function TubeGame({ getNextQuestion, isGuest = false, user = null
 
           <div className="hud-cell" style={{ flex: 1 }}>
             <span className="hud-label">STREAK</span>
-            <span className="hud-value" style={{ color: streak > 1 ? '#f39c12' : 'var(--text)' }}>
+            <span className="hud-value" style={{ color: streak > 1 ? 'var(--amber)' : 'var(--text)' }}>
               {streak}{streak > 1 ? '×' : ''}
             </span>
           </div>
@@ -669,7 +669,7 @@ export default function TubeGame({ getNextQuestion, isGuest = false, user = null
                 style={{
                   fontFamily: 'var(--font-pixel)',
                   fontSize: 8,
-                  color: '#f39c12',
+                  color: 'var(--amber)',
                   letterSpacing: '0.08em',
                   padding: '4px 10px',
                   background: 'rgba(243,156,18,0.1)',

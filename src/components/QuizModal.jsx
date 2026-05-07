@@ -11,7 +11,7 @@ function shuffle(arr) {
 
 const DIFF_COLORS = {
   easy:   { color: 'var(--success)', bg: 'rgba(46,204,113,0.12)',  border: 'rgba(46,204,113,0.4)' },
-  medium: { color: '#f39c12',        bg: 'rgba(243,156,18,0.12)',  border: 'rgba(243,156,18,0.4)' },
+  medium: { color: 'var(--amber)',   bg: 'rgba(243,156,18,0.12)',  border: 'rgba(243,156,18,0.4)' },
   hard:   { color: 'var(--danger)',  bg: 'rgba(231,76,60,0.12)',   border: 'rgba(231,76,60,0.4)'  },
 };
 
@@ -45,18 +45,18 @@ export default function QuizModal({ question, onCorrect, onWrong }) {
     if (!revealed) return {};
     if (answer === question.correct_answer) {
       return {
-        borderColor: '#2ecc71',
-        background: 'rgba(46,204,113,0.12)',
-        color: '#7fffc4',
-        boxShadow: '0 0 10px rgba(46,204,113,0.3)',
+        borderColor: 'var(--success)',
+        background: 'var(--success-tint)',
+        color: 'var(--success-text)',
+        boxShadow: '0 0 10px var(--success-glow)',
       };
     }
     if (answer === selected) {
       return {
-        borderColor: '#e74c3c',
-        background: 'rgba(231,76,60,0.12)',
-        color: '#ff9090',
-        boxShadow: '0 0 10px rgba(231,76,60,0.3)',
+        borderColor: 'var(--danger)',
+        background: 'var(--danger-tint)',
+        color: 'var(--danger-text)',
+        boxShadow: '0 0 10px var(--danger-glow)',
       };
     }
     return { opacity: 0.35 };

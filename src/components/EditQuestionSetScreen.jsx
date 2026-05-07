@@ -4,10 +4,10 @@ import BallsBackground from './BallsBackground';
 
 const EMPTY_FORM = { question: '', correct_answer: '', inc1: '', inc2: '', inc3: '' };
 
-function InputField({ label, value, onChange, placeholder, optional }) {
+function InputField({ label, value, onChange, placeholder, optional, id }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-      <label style={{
+      <label htmlFor={id} style={{
         fontFamily: 'var(--font-pixel)',
         fontSize: 7,
         color: optional ? 'var(--muted)' : 'var(--accent)',
@@ -16,6 +16,7 @@ function InputField({ label, value, onChange, placeholder, optional }) {
         {label}{optional && <span style={{ color: 'var(--muted)', marginLeft: 6 }}>(optional)</span>}
       </label>
       <input
+        id={id}
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -176,6 +177,7 @@ export default function EditQuestionSetScreen({ user, setId, onDone }) {
             {/* Set name */}
             <div className="neon-card">
               <InputField
+                id="edit-set-name"
                 label="SET NAME"
                 value={setName}
                 onChange={setSetName}
@@ -267,18 +269,21 @@ export default function EditQuestionSetScreen({ user, setId, onDone }) {
               </p>
 
               <InputField
+                id="edit-question"
                 label="QUESTION"
                 value={form.question}
                 onChange={handleFormChange('question')}
                 placeholder="Enter the question..."
               />
               <InputField
+                id="edit-correct-answer"
                 label="CORRECT ANSWER"
                 value={form.correct_answer}
                 onChange={handleFormChange('correct_answer')}
                 placeholder="The right answer..."
               />
               <InputField
+                id="edit-inc-1"
                 label="INCORRECT ANSWER 1"
                 value={form.inc1}
                 onChange={handleFormChange('inc1')}
@@ -286,6 +291,7 @@ export default function EditQuestionSetScreen({ user, setId, onDone }) {
                 optional
               />
               <InputField
+                id="edit-inc-2"
                 label="INCORRECT ANSWER 2"
                 value={form.inc2}
                 onChange={handleFormChange('inc2')}
@@ -293,6 +299,7 @@ export default function EditQuestionSetScreen({ user, setId, onDone }) {
                 optional
               />
               <InputField
+                id="edit-inc-3"
                 label="INCORRECT ANSWER 3"
                 value={form.inc3}
                 onChange={handleFormChange('inc3')}

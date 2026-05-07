@@ -82,10 +82,11 @@ export default function Auth({ onGuest }) {
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <label style={{ fontFamily: 'var(--font-pixel)', fontSize: 7, color: 'var(--muted)', letterSpacing: '0.1em' }}>
+            <label htmlFor="auth-email" style={{ fontFamily: 'var(--font-pixel)', fontSize: 7, color: 'var(--muted)', letterSpacing: '0.1em' }}>
               EMAIL
             </label>
             <input
+              id="auth-email"
               type="email"
               autoComplete="email"
               required
@@ -108,10 +109,11 @@ export default function Auth({ onGuest }) {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <label style={{ fontFamily: 'var(--font-pixel)', fontSize: 7, color: 'var(--muted)', letterSpacing: '0.1em' }}>
+            <label htmlFor="auth-password" style={{ fontFamily: 'var(--font-pixel)', fontSize: 7, color: 'var(--muted)', letterSpacing: '0.1em' }}>
               PASSWORD
             </label>
             <input
+              id="auth-password"
               type="password"
               autoComplete={isSignUp ? 'new-password' : 'current-password'}
               required

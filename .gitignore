@@ -1,8 +1,10 @@
 /script.py
 /.env
 .claude/
-.codex/
-.impeccable.md
+.impeccable/
+DESIGN.md 
+PRODUCT.md
+skills-lock.json
 # Dependencies
 node_modules/
 

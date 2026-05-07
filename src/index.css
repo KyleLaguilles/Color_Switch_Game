@@ -6,11 +6,19 @@
   --raised:    #141432;
   --border:    rgba(255,255,255,0.08);
   --text:      #e8e8f8;
-  --muted:     #7070a8;
+  --muted:     #8888bc;
   --accent:    #f1c40f;
   --accent-dark: #d4a017;
   --danger:    #e74c3c;
   --success:   #2ecc71;
+  --amber:     #f39c12;
+
+  --success-tint: rgba(46, 204, 113, 0.12);
+  --success-glow: rgba(46, 204, 113, 0.3);
+  --success-text: #7fffc4;
+  --danger-tint:  rgba(231, 76, 60, 0.12);
+  --danger-glow:  rgba(231, 76, 60, 0.3);
+  --danger-text:  #ff9090;
 
   --c-red:    #e74c3c;
   --c-blue:   #3498db;
@@ -18,8 +26,9 @@
   --c-yellow: #f1c40f;
   --c-purple: #9b59b6;
 
-  --font-pixel: 'Press Start 2P', monospace;
-  --font-body:  'Chakra Petch', sans-serif;
+  --font-pixel:   'Press Start 2P', monospace;
+  --font-body:    'Chakra Petch', sans-serif;
+  --font-display: 'Big Shoulders Display', sans-serif;
 
   --scanline-opacity: 0.04;
   --glow-spread: 18px;
@@ -180,10 +189,15 @@ body::before {
   transition: all 0.15s;
   animation: arcadeGlow 2s ease-in-out infinite;
   clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  min-height: 44px;
 }
 .btn-neon:hover  { filter: brightness(1.15); transform: scale(1.03); }
 .btn-neon:active { transform: scale(0.97); }
 .btn-neon:disabled { opacity: 0.5; cursor: default; }
+.btn-neon:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.7), 0 0 8px var(--accent), 0 0 20px rgba(241,196,15,0.4);
+}
 
 /* Ghost secondary button */
 .btn-ghost {
@@ -198,9 +212,14 @@ body::before {
   cursor: pointer;
   transition: all 0.15s;
   border-radius: 6px;
+  min-height: 44px;
 }
 .btn-ghost:hover  { border-color: rgba(255,255,255,0.2); color: var(--text); }
 .btn-ghost:active { transform: scale(0.97); }
+.btn-ghost:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.6);
+}
 
 /* HUD cells */
 .hud-cell {
