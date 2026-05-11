@@ -1,6 +1,3 @@
--- ============================================================
--- Run this entire file in the Supabase SQL editor.
--- ============================================================
 
 -- ─── Tables ──────────────────────────────────────────────────
 
@@ -119,7 +116,4 @@ create policy "users can delete own question_attempts"
   on question_attempts for delete
   using (auth.uid() = user_id);
 
--- ─── Migration: add category column (run if schema already applied) ──
--- If you applied the schema before stat tracking was added, run this:
---
--- alter table question_attempts add column if not exists category text;
+
